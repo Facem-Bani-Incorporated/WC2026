@@ -267,6 +267,7 @@ input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,179,73,.14)}
 const SUPABASE_URL  = "https://opcaanudedwsophcdypl.supabase.co";
 const SUPABASE_ANON = "sb_publishable_xu1475LvWcqCPkyLZ3O-iQ_0Ab7TqvP";
 
+let TEAMS_FLAGS, GROUPS, MATCHES, STAGES;
 const D = await (await fetch("./data.json")).json();
 TEAMS_FLAGS = D.teamsFlags;
 GROUPS      = D.groups;
