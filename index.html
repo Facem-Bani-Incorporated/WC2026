@@ -116,18 +116,21 @@ input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,179,73,.14)}
 .mhead .dt{font-family:'Archivo Narrow';font-size:11px;letter-spacing:.06em;color:var(--mut2);font-weight:600;text-transform:uppercase}
 .mhead .lockicon{font-size:11px;color:var(--red2);font-weight:700}
 .mhead .finalscore{font-family:'Archivo Narrow';font-size:11px;letter-spacing:.06em;font-weight:700;text-transform:uppercase;color:var(--green)}
-.mrow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
-.tm-side{display:flex;align-items:center;gap:9px;min-width:0}
-.tm-side.away{justify-content:flex-end;text-align:right}
-.tm-side .fl{font-size:26px;line-height:1;flex-shrink:0}
-.tm-side .nm{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.scorebox{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.scorebox input{width:46px;height:46px;text-align:center;font-family:'Anton';font-size:22px;background:var(--ink);border:1.5px solid var(--line2);border-radius:6px;color:var(--txt)}
-.scorebox input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,179,73,.16);outline:none}
-.scorebox input:disabled{opacity:.7}
-.scorebox.adm input{border-color:rgba(139,92,246,.5)}
-.scorebox.adm input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(139,92,246,.18)}
-.scorebox .dash{color:var(--mut2);font-family:'Anton';font-size:16px}
+.mrow{display:flex;flex-direction:column;gap:8px}
+.tm-side{display:flex;align-items:center;gap:10px;min-width:0}
+.tm-side .fl{font-size:24px;line-height:1;flex-shrink:0}
+.tm-side .nm{font-weight:700;font-size:14px;flex:1;min-width:0;white-space:normal;line-height:1.25}
+.tm-side .sc{width:46px;height:46px;flex-shrink:0;text-align:center;font-family:'Anton';font-size:22px;background:var(--ink);border:1.5px solid var(--line2);border-radius:6px;color:var(--txt)}
+.tm-side .sc:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,179,73,.16);outline:none}
+.tm-side .sc:disabled{opacity:.7}
+.tm-side.adm .sc{border-color:rgba(139,92,246,.5)}
+.tm-side.adm .sc:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(139,92,246,.18)}
+@media(min-width:561px){
+  .mrow{flex-direction:row;align-items:center;gap:12px}
+  .tm-side{flex:1}
+  .tm-side.away{flex-direction:row-reverse;text-align:right}
+  .tm-side .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
 .predicted{margin-top:9px;font-family:'Archivo Narrow';font-size:11px;letter-spacing:.06em;font-weight:700;text-align:center;display:none;text-transform:uppercase}
 .match.haspick .predicted{display:block;color:var(--green)}
 .ptearned{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:800;letter-spacing:.05em}
@@ -195,8 +198,8 @@ input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,179,73,.14)}
   .lb-form{display:none}
 }
 @media(max-width:560px){
-  .tm-side .nm{font-size:12px}.tm-side .fl{font-size:22px}
-  .scorebox input{width:40px;height:40px;font-size:18px}
+  .tm-side .fl{font-size:22px}
+  .tm-side .sc{width:44px;height:44px;font-size:20px}
   .standings td.team .fl{font-size:16px}
   .standings th.hd,.standings td.hd{display:none}
   .pod .pn{font-size:12px}.pod .pp{font-size:24px}
@@ -467,12 +470,9 @@ function renderGroup(g, matches){
     '<div class="match'+(locked?' locked':'')+(has?' haspick':'')+(real?' scored':'')+'" data-id="'+m.id+'">'+
       '<div class="mhead"><span class="dt">'+dstr+'</span>'+headRight+'</div>'+
       '<div class="mrow">'+
-        '<div class="tm-side"><span class="fl">'+fl(m.home)+'</span><span class="nm">'+m.home+'</span></div>'+
-        '<div class="scorebox">'+
-          '<input type="number" min="0" max="99" inputmode="numeric" data-s="home" value="'+(p.home??"")+'" '+(locked?'disabled':'')+'/>'+
-          '<span class="dash">–</span>'+
-          '<input type="number" min="0" max="99" inputmode="numeric" data-s="away" value="'+(p.away??"")+'" '+(locked?'disabled':'')+'/>'+
-        '</div>'+
+        '<div class="tm-side"><span class="fl">'+fl(m.home)+'</span><span class="nm">'+m.home+'</span><input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="home" value="'+(p.home??"")+'" '+(locked?'disabled':'')+'/></div>'+
+        '<div class="tm-side away"><span class="fl">'+fl(m.away)+'</span><span class="nm">'+m.away+'</span><input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="away" value="'+(p.away??"")+'" '+(locked?'disabled':'')+'/></div>'+
+      '</div>'+
         '<div class="tm-side away"><span class="nm">'+m.away+'</span><span class="fl">'+fl(m.away)+'</span></div>'+
       '</div>'+
       '<div class="predicted">'+predLine+'</div>'+
@@ -537,13 +537,8 @@ function renderAdmin(){
         '<div class="match'+(has?' scored':'')+'" data-id="'+m.id+'">'+
           '<div class="mhead"><span class="dt">'+dstr+'</span>'+(has?'<span class="finalscore">SALVAT '+real.home+'–'+real.away+'</span>':'')+'</div>'+
           '<div class="mrow">'+
-            '<div class="tm-side"><span class="fl">'+fl(m.home)+'</span><span class="nm">'+m.home+'</span></div>'+
-            '<div class="scorebox adm">'+
-              '<input type="number" min="0" max="99" inputmode="numeric" data-s="home" value="'+(real.home??"")+'"/>'+
-              '<span class="dash">–</span>'+
-              '<input type="number" min="0" max="99" inputmode="numeric" data-s="away" value="'+(real.away??"")+'"/>'+
-            '</div>'+
-            '<div class="tm-side away"><span class="nm">'+m.away+'</span><span class="fl">'+fl(m.away)+'</span></div>'+
+            '<div class="tm-side adm"><span class="fl">'+fl(m.home)+'</span><span class="nm">'+m.home+'</span><input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="home" value="'+(real.home??"")+'"/></div>'+
+            '<div class="tm-side away adm"><span class="fl">'+fl(m.away)+'</span><span class="nm">'+m.away+'</span><input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="away" value="'+(real.away??"")+'"/></div>'+
           '</div>'+
         '</div>';
       });
