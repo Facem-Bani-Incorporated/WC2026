@@ -1,660 +1,657 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>FIFA World Cup 26™ · Pronosticuri</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-:root{
-  --ink:#0a0a0c; --ink2:#111114; --panel:#141418; --panel2:#1b1b21;
-  --line:#26262e; --line2:#323240; --txt:#f4f4f6; --mut:#9a9aa8; --mut2:#6c6c7a;
-  --gold:#e8b349; --gold2:#f5d77a; --red:#e8113c; --red2:#ff3355;
-  --blue:#1b6ef3; --green:#19c37d; --field:#0e0e12; --purple:#8b5cf6;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:'Archivo',sans-serif;background:var(--ink);color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased;}
-body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:radial-gradient(1100px 520px at 50% -8%, rgba(232,17,60,.16), transparent 62%),
-    radial-gradient(900px 600px at 100% 110%, rgba(27,110,243,.12), transparent 60%),
-    radial-gradient(700px 500px at 0% 90%, rgba(232,179,73,.10), transparent 60%);}
-body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
-  background-image:repeating-linear-gradient(90deg, rgba(255,255,255,.012) 0 2px, transparent 2px 70px);}
-.wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:0 16px 90px}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FIFA World Cup 26™ · Pronosticuri</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root{
+            --ink:#0a0a0c; --ink2:#111114; --panel:#141418; --panel2:#1b1b21;
+            --line:#26262e; --line2:#323240; --txt:#f4f4f6; --mut:#9a9aa8; --mut2:#6c6c7a;
+            --gold:#e8b349; --gold2:#f5d77a; --red:#e8113c; --red2:#ff3355;
+            --blue:#1b6ef3; --green:#19c37d; --field:#0e0e12; --purple:#8b5cf6;
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth}
+        body{font-family:'Archivo',sans-serif;background:var(--ink);color:var(--txt);min-height:100vh;-webkit-font-smoothing:antialiased;}
+        body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+            background:radial-gradient(1100px 520px at 50% -8%, rgba(232,17,60,.16), transparent 62%),
+            radial-gradient(900px 600px at 100% 110%, rgba(27,110,243,.12), transparent 60%),
+            radial-gradient(700px 500px at 0% 90%, rgba(232,179,73,.10), transparent 60%);}
+        body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+            background-image:repeating-linear-gradient(90deg, rgba(255,255,255,.012) 0 2px, transparent 2px 70px);}
+        .wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:0 16px 90px}
 
-.brandbar{display:flex;align-items:center;gap:12px;padding:18px 0 16px;border-bottom:1px solid var(--line)}
-.crest{width:38px;height:46px;flex-shrink:0}
-.brandbar .bt{font-family:'Anton';font-size:19px;letter-spacing:.06em;line-height:1}
-.brandbar .bt small{display:block;font-family:'Archivo';font-weight:600;font-size:9.5px;letter-spacing:.42em;color:var(--gold);margin-top:3px}
-.brandbar .tm{margin-left:auto;font-family:'Archivo Narrow';font-weight:700;font-size:11px;letter-spacing:.2em;color:var(--mut2);text-transform:uppercase}
+        .brandbar{display:flex;align-items:center;gap:12px;padding:18px 0 16px;border-bottom:1px solid var(--line)}
+        .crest{width:38px;height:46px;flex-shrink:0}
+        .brandbar .bt{font-family:'Anton';font-size:19px;letter-spacing:.06em;line-height:1}
+        .brandbar .bt small{display:block;font-family:'Archivo';font-weight:600;font-size:9.5px;letter-spacing:.42em;color:var(--gold);margin-top:3px}
+        .brandbar .tm{margin-left:auto;font-family:'Archivo Narrow';font-weight:700;font-size:11px;letter-spacing:.2em;color:var(--mut2);text-transform:uppercase}
 
-.hero{padding:46px 0 30px;text-align:center;position:relative}
-.hero .yr{font-family:'Anton';font-size:13px;letter-spacing:.5em;color:var(--red2);margin-bottom:10px}
-.hero h1{font-family:'Anton';font-size:clamp(56px,13vw,140px);line-height:.82;letter-spacing:.005em;text-transform:uppercase;
-  background:linear-gradient(180deg,#fff 30%,#cfcfe0 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
-.hero h1 em{font-style:normal;display:block;background:linear-gradient(100deg,var(--gold),var(--red2) 70%,var(--gold));
-  -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 22px rgba(232,17,60,.3));}
-.hero .tag{color:var(--mut);margin-top:16px;font-size:14.5px;font-weight:500;letter-spacing:.02em}
-.hostflags{display:flex;gap:8px;justify-content:center;margin-top:14px;font-size:24px;filter:saturate(1.1)}
+        .hero{padding:46px 0 30px;text-align:center;position:relative}
+        .hero .yr{font-family:'Anton';font-size:13px;letter-spacing:.5em;color:var(--red2);margin-bottom:10px}
+        .hero h1{font-family:'Anton';font-size:clamp(56px,13vw,140px);line-height:.82;letter-spacing:.005em;text-transform:uppercase;
+            background:linear-gradient(180deg,#fff 30%,#cfcfe0 100%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+        .hero h1 em{font-style:normal;display:block;background:linear-gradient(100deg,var(--gold),var(--red2) 70%,var(--gold));
+            -webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 22px rgba(232,17,60,.3));}
+        .hero .tag{color:var(--mut);margin-top:16px;font-size:14.5px;font-weight:500;letter-spacing:.02em}
+        .hostflags{display:flex;gap:8px;justify-content:center;margin-top:14px;font-size:24px;filter:saturate(1.1)}
 
-.auth-shell{max-width:440px;margin:38px auto 0}
-.auth-card{background:linear-gradient(180deg,var(--panel),var(--ink2));border:1px solid var(--line);border-radius:6px;position:relative;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.6);}
-.auth-card .stripe{height:5px;background:linear-gradient(90deg,var(--red),var(--gold),var(--blue))}
-.auth-card .pad{padding:34px 32px 36px}
-.auth-card h2{font-family:'Anton';font-size:32px;letter-spacing:.03em;text-transform:uppercase}
-.auth-card .hint{color:var(--mut);font-size:13px;margin-top:6px;margin-bottom:8px;line-height:1.55}
-.seg{display:flex;background:var(--field);border:1px solid var(--line);border-radius:5px;padding:4px;margin:20px 0 6px}
-.seg button{flex:1;border:none;background:none;color:var(--mut);font-family:'Archivo';font-weight:700;font-size:13px;padding:11px;border-radius:3px;cursor:pointer;letter-spacing:.03em;transition:.18s;text-transform:uppercase}
-.seg button.on{background:linear-gradient(100deg,var(--gold),var(--gold2));color:#1a1206;box-shadow:0 4px 14px rgba(232,179,73,.3)}
-label{display:block;font-family:'Archivo Narrow';font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin:18px 0 7px;font-weight:700}
-input[type=text],input[type=email],input[type=password]{width:100%;background:var(--field);border:1px solid var(--line);color:var(--txt);padding:14px 15px;border-radius:5px;font-family:'Archivo';font-size:15px;outline:none;transition:.18s;font-weight:500;}
-input::placeholder{color:var(--mut2)}
-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,179,73,.14)}
-.btn{width:100%;margin-top:24px;padding:16px;border:none;border-radius:5px;cursor:pointer;font-family:'Anton';font-size:17px;letter-spacing:.06em;text-transform:uppercase;color:#1a1206;background:linear-gradient(100deg,var(--gold),var(--gold2));transition:transform .14s,box-shadow .2s;box-shadow:0 14px 34px rgba(232,179,73,.26);}
-.btn:hover{transform:translateY(-2px);box-shadow:0 20px 44px rgba(232,179,73,.4)}
-.btn:active{transform:translateY(0)}
-.btn:disabled{opacity:.6;cursor:wait;transform:none}
-.msg{padding:12px 14px;border-radius:5px;font-size:13px;margin-top:16px;display:none;font-weight:500;line-height:1.5}
-.msg.err{background:rgba(232,17,60,.12);border:1px solid rgba(232,17,60,.4);color:#ffb3c0}
-.msg.ok{background:rgba(25,195,125,.1);border:1px solid rgba(25,195,125,.4);color:#9bf0cd}
+        .auth-shell{max-width:440px;margin:38px auto 0}
+        .auth-card{background:linear-gradient(180deg,var(--panel),var(--ink2));border:1px solid var(--line);border-radius:6px;position:relative;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.6);}
+        .auth-card .stripe{height:5px;background:linear-gradient(90deg,var(--red),var(--gold),var(--blue))}
+        .auth-card .pad{padding:34px 32px 36px}
+        .auth-card h2{font-family:'Anton';font-size:32px;letter-spacing:.03em;text-transform:uppercase}
+        .auth-card .hint{color:var(--mut);font-size:13px;margin-top:6px;margin-bottom:8px;line-height:1.55}
+        .seg{display:flex;background:var(--field);border:1px solid var(--line);border-radius:5px;padding:4px;margin:20px 0 6px}
+        .seg button{flex:1;border:none;background:none;color:var(--mut);font-family:'Archivo';font-weight:700;font-size:13px;padding:11px;border-radius:3px;cursor:pointer;letter-spacing:.03em;transition:.18s;text-transform:uppercase}
+        .seg button.on{background:linear-gradient(100deg,var(--gold),var(--gold2));color:#1a1206;box-shadow:0 4px 14px rgba(232,179,73,.3)}
+        label{display:block;font-family:'Archivo Narrow';font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin:18px 0 7px;font-weight:700}
+        input[type=text],input[type=email],input[type=password]{width:100%;background:var(--field);border:1px solid var(--line);color:var(--txt);padding:14px 15px;border-radius:5px;font-family:'Archivo';font-size:15px;outline:none;transition:.18s;font-weight:500;}
+        input::placeholder{color:var(--mut2)}
+        input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,179,73,.14)}
+        .btn{width:100%;margin-top:24px;padding:16px;border:none;border-radius:5px;cursor:pointer;font-family:'Anton';font-size:17px;letter-spacing:.06em;text-transform:uppercase;color:#1a1206;background:linear-gradient(100deg,var(--gold),var(--gold2));transition:transform .14s,box-shadow .2s;box-shadow:0 14px 34px rgba(232,179,73,.26);}
+        .btn:hover{transform:translateY(-2px);box-shadow:0 20px 44px rgba(232,179,73,.4)}
+        .btn:active{transform:translateY(0)}
+        .btn:disabled{opacity:.6;cursor:wait;transform:none}
+        .msg{padding:12px 14px;border-radius:5px;font-size:13px;margin-top:16px;display:none;font-weight:500;line-height:1.5}
+        .msg.err{background:rgba(232,17,60,.12);border:1px solid rgba(232,17,60,.4);color:#ffb3c0}
+        .msg.ok{background:rgba(25,195,125,.1);border:1px solid rgba(25,195,125,.4);color:#9bf0cd}
 
-.topbar{display:flex;align-items:center;gap:14px;background:linear-gradient(180deg,var(--panel),var(--ink2));border:1px solid var(--line);border-radius:6px;padding:13px 18px;margin-top:6px}
-.avatar{width:44px;height:44px;border-radius:6px;display:grid;place-items:center;font-family:'Anton';font-size:21px;color:#1a1206;background:linear-gradient(135deg,var(--gold),var(--red2));flex-shrink:0}
-.whoami b{font-size:15px;font-weight:800;display:block;line-height:1.2}
-.whoami span{color:var(--mut2);font-size:12px;font-weight:500}
-.adminbadge{font-family:'Archivo Narrow';font-size:9.5px;font-weight:700;letter-spacing:.14em;color:#1a1206;background:var(--gold);padding:2px 7px;border-radius:3px;text-transform:uppercase;margin-left:7px;vertical-align:middle}
-.logout{margin-left:auto;background:var(--field);border:1px solid var(--line);color:var(--mut);padding:10px 16px;border-radius:5px;cursor:pointer;font-family:'Archivo';font-weight:700;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;transition:.18s}
-.logout:hover{border-color:var(--red);color:#ffb3c0}
+        .topbar{display:flex;align-items:center;gap:14px;background:linear-gradient(180deg,var(--panel),var(--ink2));border:1px solid var(--line);border-radius:6px;padding:13px 18px;margin-top:6px}
+        .avatar{width:44px;height:44px;border-radius:6px;display:grid;place-items:center;font-family:'Anton';font-size:21px;color:#1a1206;background:linear-gradient(135deg,var(--gold),var(--red2));flex-shrink:0}
+        .whoami b{font-size:15px;font-weight:800;display:block;line-height:1.2}
+        .whoami span{color:var(--mut2);font-size:12px;font-weight:500}
+        .adminbadge{font-family:'Archivo Narrow';font-size:9.5px;font-weight:700;letter-spacing:.14em;color:#1a1206;background:var(--gold);padding:2px 7px;border-radius:3px;text-transform:uppercase;margin-left:7px;vertical-align:middle}
+        .logout{margin-left:auto;background:var(--field);border:1px solid var(--line);color:var(--mut);padding:10px 16px;border-radius:5px;cursor:pointer;font-family:'Archivo';font-weight:700;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;transition:.18s}
+        .logout:hover{border-color:var(--red);color:#ffb3c0}
 
-.stagenav{display:flex;gap:6px;margin:18px 0 4px;flex-wrap:wrap}
-.snav{flex:1;min-width:96px;background:var(--panel);border:1px solid var(--line);color:var(--mut);padding:14px 8px;border-radius:6px;cursor:pointer;font-family:'Archivo';font-weight:800;font-size:13px;transition:.18s;text-align:center;letter-spacing:.02em;position:relative}
-.snav .big{font-family:'Anton';font-size:17px;letter-spacing:.03em;text-transform:uppercase;display:block}
-.snav .sm{font-size:9.5px;font-weight:600;color:var(--mut2);display:block;margin-top:3px;letter-spacing:.05em;text-transform:uppercase}
-.snav.on{color:#1a1206;background:linear-gradient(100deg,var(--gold),var(--gold2));border-color:transparent;box-shadow:0 10px 26px rgba(232,179,73,.24)}
-.snav.on .sm{color:#5c4410}
-.snav.locked{opacity:.45;cursor:not-allowed}
-.snav.admin.on{background:linear-gradient(100deg,var(--purple),#a78bfa);color:#fff;box-shadow:0 10px 26px rgba(139,92,246,.3)}
-.snav.admin.on .sm{color:#e9e0ff}
+        .stagenav{display:flex;gap:6px;margin:18px 0 4px;flex-wrap:wrap}
+        .snav{flex:1;min-width:96px;background:var(--panel);border:1px solid var(--line);color:var(--mut);padding:14px 8px;border-radius:6px;cursor:pointer;font-family:'Archivo';font-weight:800;font-size:13px;transition:.18s;text-align:center;letter-spacing:.02em;position:relative}
+        .snav .big{font-family:'Anton';font-size:17px;letter-spacing:.03em;text-transform:uppercase;display:block}
+        .snav .sm{font-size:9.5px;font-weight:600;color:var(--mut2);display:block;margin-top:3px;letter-spacing:.05em;text-transform:uppercase}
+        .snav.on{color:#1a1206;background:linear-gradient(100deg,var(--gold),var(--gold2));border-color:transparent;box-shadow:0 10px 26px rgba(232,179,73,.24)}
+        .snav.on .sm{color:#5c4410}
+        .snav.locked{opacity:.45;cursor:not-allowed}
+        .snav.admin.on{background:linear-gradient(100deg,var(--purple),#a78bfa);color:#fff;box-shadow:0 10px 26px rgba(139,92,246,.3)}
+        .snav.admin.on .sm{color:#e9e0ff}
 
-.banner{display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--green);border-radius:5px;padding:13px 16px;margin:16px 0;font-size:13px;color:var(--mut)}
-.banner.closed{border-left-color:var(--red)}
-.banner.info{border-left-color:var(--blue)}
-.pulse{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(25,195,125,.6);animation:pl 2s infinite;flex-shrink:0}
-.banner.closed .pulse{background:var(--red);animation:none}
-.banner.info .pulse{background:var(--blue);animation:none}
-@keyframes pl{0%{box-shadow:0 0 0 0 rgba(25,195,125,.5)}70%{box-shadow:0 0 0 8px rgba(25,195,125,0)}100%{box-shadow:0 0 0 0 rgba(25,195,125,0)}}
+        .banner{display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--green);border-radius:5px;padding:13px 16px;margin:16px 0;font-size:13px;color:var(--mut)}
+        .banner.closed{border-left-color:var(--red)}
+        .banner.info{border-left-color:var(--blue)}
+        .pulse{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 0 rgba(25,195,125,.6);animation:pl 2s infinite;flex-shrink:0}
+        .banner.closed .pulse{background:var(--red);animation:none}
+        .banner.info .pulse{background:var(--blue);animation:none}
+        @keyframes pl{0%{box-shadow:0 0 0 0 rgba(25,195,125,.5)}70%{box-shadow:0 0 0 8px rgba(25,195,125,0)}100%{box-shadow:0 0 0 0 rgba(25,195,125,0)}}
 
-.group{background:linear-gradient(180deg,var(--panel),var(--ink2));border:1px solid var(--line);border-radius:8px;margin-bottom:18px;overflow:hidden}
-.group-head{display:flex;align-items:center;gap:12px;padding:15px 18px;background:var(--ink2);border-bottom:1px solid var(--line)}
-.gbadge{width:34px;height:34px;border-radius:5px;display:grid;place-items:center;font-family:'Anton';font-size:20px;color:#1a1206;background:linear-gradient(135deg,var(--gold),var(--gold2))}
-.group-head .gt{font-family:'Anton';font-size:19px;letter-spacing:.05em;text-transform:uppercase}
-.group-head .gc{margin-left:auto;font-family:'Archivo Narrow';font-size:11px;letter-spacing:.14em;color:var(--mut2);text-transform:uppercase;font-weight:700}
+        .group{background:linear-gradient(180deg,var(--panel),var(--ink2));border:1px solid var(--line);border-radius:8px;margin-bottom:18px;overflow:hidden}
+        .group-head{display:flex;align-items:center;gap:12px;padding:15px 18px;background:var(--ink2);border-bottom:1px solid var(--line)}
+        .gbadge{width:34px;height:34px;border-radius:5px;display:grid;place-items:center;font-family:'Anton';font-size:20px;color:#1a1206;background:linear-gradient(135deg,var(--gold),var(--gold2))}
+        .group-head .gt{font-family:'Anton';font-size:19px;letter-spacing:.05em;text-transform:uppercase}
+        .group-head .gc{margin-left:auto;font-family:'Archivo Narrow';font-size:11px;letter-spacing:.14em;color:var(--mut2);text-transform:uppercase;font-weight:700}
 
-.standings{padding:6px 14px 10px;border-bottom:1px solid var(--line)}
-.standings table{width:100%;border-collapse:collapse;font-family:'Archivo Narrow'}
-.standings th{font-size:10px;letter-spacing:.1em;color:var(--mut2);text-transform:uppercase;text-align:center;padding:8px 4px;font-weight:700}
-.standings th.lt{text-align:left;padding-left:6px}
-.standings td{padding:7px 4px;text-align:center;font-size:13.5px;font-weight:600;border-top:1px solid var(--line)}
-.standings td.lt{text-align:left;padding-left:6px}
-.standings td.team{display:flex;align-items:center;gap:8px}
-.standings td.team .fl{font-size:19px}
-.standings tr.qual td:first-child{box-shadow:inset 3px 0 0 var(--green)}
-.standings .pos{color:var(--mut2);width:18px;display:inline-block}
-.standings td.ptcol b{color:var(--gold)}
+        .standings{padding:6px 14px 10px;border-bottom:1px solid var(--line)}
+        .standings table{width:100%;border-collapse:collapse;font-family:'Archivo Narrow'}
+        .standings th{font-size:10px;letter-spacing:.1em;color:var(--mut2);text-transform:uppercase;text-align:center;padding:8px 4px;font-weight:700}
+        .standings th.lt{text-align:left;padding-left:6px}
+        .standings td{padding:7px 4px;text-align:center;font-size:13.5px;font-weight:600;border-top:1px solid var(--line)}
+        .standings td.lt{text-align:left;padding-left:6px}
+        .standings td.team{display:flex;align-items:center;gap:8px}
+        .standings td.team .fl{font-size:19px}
+        .standings tr.qual td:first-child{box-shadow:inset 3px 0 0 var(--green)}
+        .standings .pos{color:var(--mut2);width:18px;display:inline-block}
+        .standings td.ptcol b{color:var(--gold)}
 
-.matches{padding:10px 14px 14px}
-.match{background:var(--field);border:1px solid var(--line);border-radius:7px;padding:13px 15px;margin-top:9px;transition:.18s}
-.match:first-child{margin-top:4px}
-.match:hover{border-color:var(--line2)}
-.match.locked{opacity:.62}
-.match.scored{border-color:rgba(25,195,125,.3)}
-.mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
-.mhead .dt{font-family:'Archivo Narrow';font-size:11px;letter-spacing:.06em;color:var(--mut2);font-weight:600;text-transform:uppercase}
-.mhead .lockicon{font-size:11px;color:var(--red2);font-weight:700}
-.mhead .finalscore{font-family:'Archivo Narrow';font-size:11px;letter-spacing:.06em;font-weight:700;text-transform:uppercase;color:var(--green)}
-.mrow{display:flex;flex-direction:column;gap:8px}
-.tm-side{display:flex;align-items:center;gap:10px;min-width:0}
-.tm-side .fl{font-size:24px;line-height:1;flex-shrink:0}
-.tm-side .nm{font-weight:700;font-size:14px;flex:1;min-width:0;white-space:normal;line-height:1.25}
-.tm-side .sc{width:46px;height:46px;flex-shrink:0;text-align:center;font-family:'Anton';font-size:22px;background:var(--ink);border:1.5px solid var(--line2);border-radius:6px;color:var(--txt)}
-.tm-side .sc:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,179,73,.16);outline:none}
-.tm-side .sc:disabled{opacity:.7}
-.tm-side.adm .sc{border-color:rgba(139,92,246,.5)}
-.tm-side.adm .sc:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(139,92,246,.18)}
-@media(min-width:561px){
-  .mrow{flex-direction:row;align-items:center;gap:12px}
-  .tm-side{flex:1}
-  .tm-side.away{flex-direction:row-reverse;text-align:right}
-  .tm-side .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-}
-.predicted{margin-top:9px;font-family:'Archivo Narrow';font-size:11px;letter-spacing:.06em;font-weight:700;text-align:center;display:none;text-transform:uppercase}
-.match.haspick .predicted{display:block;color:var(--green)}
-.ptearned{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:800;letter-spacing:.05em}
-.ptearned.p3{background:rgba(25,195,125,.18);color:#7df0c0}
-.ptearned.p1{background:rgba(232,179,73,.18);color:var(--gold2)}
-.ptearned.p0{background:rgba(232,17,60,.15);color:#ffb3c0}
+        .matches{padding:10px 14px 14px}
+        .match{background:var(--field);border:1px solid var(--line);border-radius:7px;padding:13px 15px;margin-top:9px;transition:.18s}
+        .match:first-child{margin-top:4px}
+        .match:hover{border-color:var(--line2)}
+        .match.locked{opacity:.62}
+        .match.scored{border-color:rgba(25,195,125,.3)}
+        .mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px}
+        .mhead .dt{font-family:'Archivo Narrow';font-size:11px;letter-spacing:.06em;color:var(--mut2);font-weight:600;text-transform:uppercase}
+        .mhead .lockicon{font-size:11px;color:var(--red2);font-weight:700}
+        .mhead .finalscore{font-family:'Archivo Narrow';font-size:11px;letter-spacing:.06em;font-weight:700;text-transform:uppercase;color:var(--green)}
+        .mrow{display:flex;flex-direction:column;gap:8px}
+        .tm-side{display:flex;align-items:center;gap:10px;min-width:0}
+        .tm-side .fl{font-size:24px;line-height:1;flex-shrink:0}
+        .tm-side .nm{font-weight:700;font-size:14px;flex:1;min-width:0;white-space:normal;line-height:1.25}
+        .tm-side .sc{width:46px;height:46px;flex-shrink:0;text-align:center;font-family:'Anton';font-size:22px;background:var(--ink);border:1.5px solid var(--line2);border-radius:6px;color:var(--txt)}
+        .tm-side .sc:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,179,73,.16);outline:none}
+        .tm-side .sc:disabled{opacity:.7}
+        .tm-side.adm .sc{border-color:rgba(139,92,246,.5)}
+        .tm-side.adm .sc:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(139,92,246,.18)}
+        @media(min-width:561px){
+            .mrow{flex-direction:row;align-items:center;gap:12px}
+            .tm-side{flex:1}
+            .tm-side.away{flex-direction:row-reverse;text-align:right}
+            .tm-side .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        }
+        .predicted{margin-top:9px;font-family:'Archivo Narrow';font-size:11px;letter-spacing:.06em;font-weight:700;text-align:center;display:none;text-transform:uppercase}
+        .match.haspick .predicted{display:block;color:var(--green)}
+        .ptearned{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:800;letter-spacing:.05em}
+        .ptearned.p3{background:rgba(25,195,125,.18);color:#7df0c0}
+        .ptearned.p1{background:rgba(232,179,73,.18);color:var(--gold2)}
+        .ptearned.p0{background:rgba(232,17,60,.15);color:#ffb3c0}
 
-.savebar{position:sticky;bottom:14px;margin-top:22px;display:flex;gap:12px;align-items:center;background:rgba(20,20,24,.94);backdrop-filter:blur(14px);border:1px solid var(--line2);border-radius:8px;padding:13px 16px;box-shadow:0 24px 60px rgba(0,0,0,.6)}
-.savebar span{flex:1;font-size:13px;color:var(--mut);font-weight:500}
-.savebar .btn{width:auto;margin:0;padding:13px 26px;font-size:15px}
-.savebar .btn.adm{background:linear-gradient(100deg,var(--purple),#a78bfa);color:#fff}
+        .savebar{position:sticky;bottom:14px;margin-top:22px;display:flex;gap:12px;align-items:center;background:rgba(20,20,24,.94);backdrop-filter:blur(14px);border:1px solid var(--line2);border-radius:8px;padding:13px 16px;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+        .savebar span{flex:1;font-size:13px;color:var(--mut);font-weight:500}
+        .savebar .btn{width:auto;margin:0;padding:13px 26px;font-size:15px}
+        .savebar .btn.adm{background:linear-gradient(100deg,var(--purple),#a78bfa);color:#fff}
 
-.lb-title{font-family:'Anton';font-size:30px;letter-spacing:.04em;text-transform:uppercase;margin:20px 0 6px;text-align:center}
-.lb-title .sub{display:block;font-family:'Archivo';font-size:11px;font-weight:600;letter-spacing:.3em;color:var(--gold);margin-top:5px}
+        .lb-title{font-family:'Anton';font-size:30px;letter-spacing:.04em;text-transform:uppercase;margin:20px 0 6px;text-align:center}
+        .lb-title .sub{display:block;font-family:'Archivo';font-size:11px;font-weight:600;letter-spacing:.3em;color:var(--gold);margin-top:5px}
 
-/* PODIUM */
-.podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:10px;align-items:end;margin:22px 0 4px}
-.pod{background:linear-gradient(180deg,var(--panel),var(--ink2));border:1px solid var(--line);border-radius:8px;padding:18px 12px;text-align:center;position:relative;overflow:hidden}
-.pod .pav{width:50px;height:50px;border-radius:8px;margin:0 auto 10px;display:grid;place-items:center;font-family:'Anton';font-size:23px;color:#1a1206}
-.pod.p1{border-color:rgba(232,179,73,.5);box-shadow:0 0 30px rgba(232,179,73,.12)}
-.pod.p1 .pav{background:linear-gradient(135deg,var(--gold),var(--gold2));width:58px;height:58px;font-size:27px}
-.pod.p2 .pav{background:linear-gradient(135deg,#cdd2e4,#9aa0b8)}
-.pod.p3 .pav{background:linear-gradient(135deg,#d08a4a,#b06b2e)}
-.pod .medal{font-size:22px;margin-bottom:6px}
-.pod .pn{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pod .pp{font-family:'Anton';font-size:30px;color:var(--gold);margin-top:4px;line-height:1}
-.pod .pp small{font-size:11px;color:var(--mut2);font-family:'Archivo';margin-left:3px}
-.pod.p1{padding-top:24px;padding-bottom:24px}
+        /* PODIUM */
+        .podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:10px;align-items:end;margin:22px 0 4px}
+        .pod{background:linear-gradient(180deg,var(--panel),var(--ink2));border:1px solid var(--line);border-radius:8px;padding:18px 12px;text-align:center;position:relative;overflow:hidden}
+        .pod .pav{width:50px;height:50px;border-radius:8px;margin:0 auto 10px;display:grid;place-items:center;font-family:'Anton';font-size:23px;color:#1a1206}
+        .pod.p1{border-color:rgba(232,179,73,.5);box-shadow:0 0 30px rgba(232,179,73,.12)}
+        .pod.p1 .pav{background:linear-gradient(135deg,var(--gold),var(--gold2));width:58px;height:58px;font-size:27px}
+        .pod.p2 .pav{background:linear-gradient(135deg,#cdd2e4,#9aa0b8)}
+        .pod.p3 .pav{background:linear-gradient(135deg,#d08a4a,#b06b2e)}
+        .pod .medal{font-size:22px;margin-bottom:6px}
+        .pod .pn{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .pod .pp{font-family:'Anton';font-size:30px;color:var(--gold);margin-top:4px;line-height:1}
+        .pod .pp small{font-size:11px;color:var(--mut2);font-family:'Archivo';margin-left:3px}
+        .pod.p1{padding-top:24px;padding-bottom:24px}
 
-.lb{background:linear-gradient(180deg,var(--panel),var(--ink2));border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:12px}
-.lb-head{display:grid;grid-template-columns:46px 1fr repeat(4,52px) 60px;gap:8px;padding:12px 18px;background:var(--ink2);border-bottom:1px solid var(--line);font-family:'Archivo Narrow';font-size:10px;letter-spacing:.08em;color:var(--mut2);text-transform:uppercase;font-weight:700;align-items:center}
-.lb-head .lt{text-align:left}
-.lb-head span{text-align:center}
-.lb-row{display:grid;grid-template-columns:46px 1fr repeat(4,52px) 60px;gap:8px;padding:14px 18px;border-bottom:1px solid var(--line);align-items:center}
-.lb-row:last-child{border-bottom:none}
-.lb-row.me{background:rgba(232,179,73,.07)}
-.rk{font-family:'Anton';font-size:22px;text-align:center}
-.rk.g{color:var(--gold)} .rk.s{color:#cdd2e4} .rk.b{color:#d08a4a}
-.lb-name{display:flex;align-items:center;gap:10px;font-weight:800;font-size:14.5px;min-width:0}
-.lb-name .av{width:32px;height:32px;border-radius:5px;display:grid;place-items:center;font-family:'Anton';font-size:15px;color:#1a1206;background:linear-gradient(135deg,var(--blue),var(--green));flex-shrink:0}
-.lb-name .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lb-name .tagme{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;flex-shrink:0}
-.lb-cell{text-align:center;font-weight:700;font-size:14px;font-family:'Archivo Narrow'}
-.lb-cell.mut{color:var(--mut2)}
-.lb-pts{text-align:center;font-family:'Anton';font-size:24px;color:var(--gold)}
-.lb-form{display:flex;gap:3px;justify-content:center;margin-top:5px}
-.fdot{width:7px;height:7px;border-radius:50%}
-.fdot.f3{background:var(--green)} .fdot.f1{background:var(--gold)} .fdot.f0{background:#3a3a44}
+        .lb{background:linear-gradient(180deg,var(--panel),var(--ink2));border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:12px}
+        .lb-head{display:grid;grid-template-columns:44px 1fr 60px 60px 64px;gap:8px;padding:12px 18px;background:var(--ink2);border-bottom:1px solid var(--line);font-family:'Archivo Narrow';font-size:10px;letter-spacing:.08em;color:var(--mut2);text-transform:uppercase;font-weight:700;align-items:center}
+        .lb-head .lt{text-align:left}
+        .lb-head span{text-align:center}
+        .lb-row{display:grid;grid-template-columns:44px 1fr 60px 60px 64px;gap:8px;padding:14px 18px;border-bottom:1px solid var(--line);align-items:center}
+        .lb-row:last-child{border-bottom:none}
+        .lb-row.me{background:rgba(232,179,73,.07)}
+        .rk{font-family:'Anton';font-size:22px;text-align:center}
+        .rk.g{color:var(--gold)} .rk.s{color:#cdd2e4} .rk.b{color:#d08a4a}
+        .lb-name{display:flex;align-items:center;gap:10px;font-weight:800;font-size:14.5px;min-width:0}
+        .lb-name .av{width:32px;height:32px;border-radius:5px;display:grid;place-items:center;font-family:'Anton';font-size:15px;color:#1a1206;background:linear-gradient(135deg,var(--blue),var(--green));flex-shrink:0}
+        .lb-name .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .lb-name .tagme{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;flex-shrink:0}
+        .lb-cell{text-align:center;font-weight:700;font-size:14px;font-family:'Archivo Narrow'}
+        .lb-cell.mut{color:var(--mut2)}
+        .lb-pts{text-align:center;font-family:'Anton';font-size:24px;color:var(--gold)}
+        .lb-form{display:flex;gap:3px;justify-content:center;margin-top:5px}
+        .fdot{width:7px;height:7px;border-radius:50%}
+        .fdot.f3{background:var(--green)} .fdot.f1{background:var(--gold)} .fdot.f0{background:#3a3a44}
 
-.scoring{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:18px 20px;margin-top:16px;font-size:13px;color:var(--mut);line-height:1.9}
-.scoring b{color:var(--gold)}
-.scoring .h{font-family:'Anton';font-size:15px;letter-spacing:.04em;color:var(--txt);text-transform:uppercase;display:block;margin-bottom:6px}
+        .scoring{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:18px 20px;margin-top:16px;font-size:13px;color:var(--mut);line-height:1.9}
+        .scoring b{color:var(--gold)}
+        .scoring .h{font-family:'Anton';font-size:15px;letter-spacing:.04em;color:var(--txt);text-transform:uppercase;display:block;margin-bottom:6px}
 
-.center-msg{text-align:center;color:var(--mut);padding:64px 20px;font-size:15px;line-height:1.6}
-.center-msg .ic{font-size:40px;display:block;margin-bottom:14px}
-.loader{text-align:center;padding:70px;color:var(--mut)}
-.spinner{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--gold);border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 16px}
-@keyframes sp{to{transform:rotate(360deg)}}
-.hidden{display:none!important}
+        .center-msg{text-align:center;color:var(--mut);padding:64px 20px;font-size:15px;line-height:1.6}
+        .center-msg .ic{font-size:40px;display:block;margin-bottom:14px}
+        .loader{text-align:center;padding:70px;color:var(--mut)}
+        .spinner{width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--gold);border-radius:50%;animation:sp 1s linear infinite;margin:0 auto 16px}
+        @keyframes sp{to{transform:rotate(360deg)}}
+        .hidden{display:none!important}
 
-@media(max-width:620px){
-  .lb-head{grid-template-columns:38px 1fr 44px 52px;font-size:9px}
-  .lb-row{grid-template-columns:38px 1fr 44px 52px}
-  .lb-head .hd-ex,.lb-head .hd-co,.lb-cell.hd-ex,.lb-cell.hd-co{display:none}
-  .lb-form{display:none}
-}
-@media(max-width:560px){
-  .tm-side .fl{font-size:22px}
-  .tm-side .sc{width:44px;height:44px;font-size:20px}
-  .standings td.team .fl{font-size:16px}
-  .standings th.hd,.standings td.hd{display:none}
-  .pod .pn{font-size:12px}.pod .pp{font-size:24px}
-}
-</style>
+        @media(max-width:620px){
+            .lb-head,.lb-row{grid-template-columns:30px 1fr 40px 40px 46px;gap:5px;padding-left:9px;padding-right:9px}
+            .lb-head{font-size:9px}
+            .lb-name{gap:8px}
+            .lb-name .av{width:26px;height:26px;font-size:13px}
+            .lb-form{display:none}
+        }
+        @media(max-width:560px){
+            .tm-side .fl{font-size:22px}
+            .tm-side .sc{width:44px;height:44px;font-size:20px}
+            .standings td.team .fl{font-size:16px}
+            .standings th.hd,.standings td.hd{display:none}
+            .pod .pn{font-size:12px}.pod .pp{font-size:24px}
+        }
+    </style>
 </head>
 <body>
 <div class="wrap">
 
-  <div class="brandbar">
-    <svg class="crest" viewBox="0 0 38 46" fill="none">
-      <path d="M19 1L37 9V23C37 35 28 43 19 45C10 43 1 35 1 23V9L19 1Z" fill="#141418" stroke="#e8b349" stroke-width="1.5"/>
-      <path d="M19 1L37 9V23C37 35 28 43 19 45" fill="url(#g1)" opacity="0.18"/>
-      <circle cx="19" cy="20" r="8" fill="none" stroke="#e8b349" stroke-width="1.3"/>
-      <path d="M19 12L21.5 18H27.5L22.7 21.7L24.5 27.5L19 24L13.5 27.5L15.3 21.7L10.5 18H16.5L19 12Z" fill="#e8b349"/>
-      <defs><linearGradient id="g1" x1="19" y1="1" x2="37" y2="45"><stop stop-color="#e8113c"/><stop offset="1" stop-color="#1b6ef3"/></linearGradient></defs>
-    </svg>
-    <div class="bt">WORLD CUP 26<small>PREDICTOR LEAGUE</small></div>
-    <div class="tm">USA · CANADA · MEXICO</div>
-  </div>
-
-  <div id="authScreen">
-    <div class="hero">
-      <div class="yr">JUNE — JULY 2026</div>
-      <h1>PRONOSTICURI<em>CUPA MONDIALĂ</em></h1>
-      <div class="tag">Liga privată de predicții · 48 de echipe · 12 grupe · un singur campion între voi</div>
-      <div class="hostflags">🇺🇸 🇨🇦 🇲🇽</div>
+    <div class="brandbar">
+        <svg class="crest" viewBox="0 0 38 46" fill="none">
+            <path d="M19 1L37 9V23C37 35 28 43 19 45C10 43 1 35 1 23V9L19 1Z" fill="#141418" stroke="#e8b349" stroke-width="1.5"/>
+            <path d="M19 1L37 9V23C37 35 28 43 19 45" fill="url(#g1)" opacity="0.18"/>
+            <circle cx="19" cy="20" r="8" fill="none" stroke="#e8b349" stroke-width="1.3"/>
+            <path d="M19 12L21.5 18H27.5L22.7 21.7L24.5 27.5L19 24L13.5 27.5L15.3 21.7L10.5 18H16.5L19 12Z" fill="#e8b349"/>
+            <defs><linearGradient id="g1" x1="19" y1="1" x2="37" y2="45"><stop stop-color="#e8113c"/><stop offset="1" stop-color="#1b6ef3"/></linearGradient></defs>
+        </svg>
+        <div class="bt">WORLD CUP 26<small>PREDICTOR LEAGUE</small></div>
+        <div class="tm">USA · CANADA · MEXICO</div>
     </div>
-    <div class="auth-shell">
-      <div class="auth-card">
-        <div class="stripe"></div>
-        <div class="pad">
-          <h2 id="authTitle">Înscrie-te</h2>
-          <p class="hint" id="authHint">Prima dată îți faci cont și îți alegi un nume — ăla apare în clasament.</p>
-          <div class="seg">
-            <button id="segSignup" class="on" type="button">Cont nou</button>
-            <button id="segLogin" type="button">Am deja cont</button>
-          </div>
-          <div id="nameField">
-            <label>Numele tău (în clasament)</label>
-            <input type="text" id="displayName" placeholder="ex: Razvan, Maestrul..." maxlength="20" autocomplete="off"/>
-          </div>
-          <label>Email</label>
-          <input type="email" id="email" placeholder="email@exemplu.ro" autocomplete="email"/>
-          <label>Parolă</label>
-          <input type="password" id="password" placeholder="minim 6 caractere" autocomplete="current-password"/>
-          <div class="msg err" id="authErr"></div>
-          <div class="msg ok" id="authOk"></div>
-          <button class="btn" id="authBtn" type="button">Creează cont</button>
+
+    <div id="authScreen">
+        <div class="hero">
+            <div class="yr">JUNE — JULY 2026</div>
+            <h1>PRONOSTICURI<em>CUPA MONDIALĂ</em></h1>
+            <div class="tag">Liga privată de predicții · 48 de echipe · 12 grupe · un singur campion între voi</div>
+            <div class="hostflags">🇺🇸 🇨🇦 🇲🇽</div>
         </div>
-      </div>
+        <div class="auth-shell">
+            <div class="auth-card">
+                <div class="stripe"></div>
+                <div class="pad">
+                    <h2 id="authTitle">Înscrie-te</h2>
+                    <p class="hint" id="authHint">Prima dată îți faci cont și îți alegi un nume — ăla apare în clasament.</p>
+                    <div class="seg">
+                        <button id="segSignup" class="on" type="button">Cont nou</button>
+                        <button id="segLogin" type="button">Am deja cont</button>
+                    </div>
+                    <div id="nameField">
+                        <label>Numele tău (în clasament)</label>
+                        <input type="text" id="displayName" placeholder="ex: Razvan, Maestrul..." maxlength="20" autocomplete="off"/>
+                    </div>
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="email@exemplu.ro" autocomplete="email"/>
+                    <label>Parolă</label>
+                    <input type="password" id="password" placeholder="minim 6 caractere" autocomplete="current-password"/>
+                    <div class="msg err" id="authErr"></div>
+                    <div class="msg ok" id="authOk"></div>
+                    <button class="btn" id="authBtn" type="button">Creează cont</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <div id="appScreen" class="hidden">
-    <div class="topbar">
-      <div class="avatar" id="userAv">?</div>
-      <div class="whoami"><b id="userName">—</b><span id="userEmail">—</span></div>
-      <button class="logout" id="logoutBtn" type="button">Ieși</button>
+    <div id="appScreen" class="hidden">
+        <div class="topbar">
+            <div class="avatar" id="userAv">?</div>
+            <div class="whoami"><b id="userName">—</b><span id="userEmail">—</span></div>
+            <button class="logout" id="logoutBtn" type="button">Ieși</button>
+        </div>
+        <div class="stagenav" id="stagenav"></div>
+        <div id="content"><div class="loader"><div class="spinner"></div>Se încarcă...</div></div>
     </div>
-    <div class="stagenav" id="stagenav"></div>
-    <div id="content"><div class="loader"><div class="spinner"></div>Se încarcă...</div></div>
-  </div>
 
 </div>
 
 <script type="module">
-const SUPABASE_URL  = "https://opcaanudedwsophcdypl.supabase.co";
-const SUPABASE_ANON = "sb_publishable_xu1475LvWcqCPkyLZ3O-iQ_0Ab7TqvP";
+    const SUPABASE_URL  = "https://opcaanudedwsophcdypl.supabase.co";
+    const SUPABASE_ANON = "sb_publishable_xu1475LvWcqCPkyLZ3O-iQ_0Ab7TqvP";
 
-let TEAMS_FLAGS, GROUPS, MATCHES, STAGES;
-const D = await (await fetch("./data.json")).json();
-TEAMS_FLAGS = D.teamsFlags;
-GROUPS      = D.groups;
-MATCHES     = D.matches;
-STAGES      = D.stages;
+    let TEAMS_FLAGS, GROUPS, MATCHES, STAGES;
+    const D = await (await fetch("./data.json")).json();
+    TEAMS_FLAGS = D.teamsFlags;
+    GROUPS      = D.groups;
+    MATCHES     = D.matches;
+    STAGES      = D.stages;
 
 
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-const $ = (id)=>document.getElementById(id);
-const fl = (t)=>TEAMS_FLAGS[t] || "🏳️";
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    const $ = (id)=>document.getElementById(id);
+    const fl = (t)=>TEAMS_FLAGS[t] || "🏳️";
 
-let mode="signup", me=null, isAdmin=false, myPicks={}, results={}, activeTab=1;
-const isFileProto = location.protocol === "file:";
+    let mode="signup", me=null, isAdmin=false, myPicks={}, results={}, activeTab=1;
+    const isFileProto = location.protocol === "file:";
 
-/* ---------- AUTH UI ---------- */
-function setMode(m){
-  mode=m;const su=m==="signup";
-  $("segSignup").classList.toggle("on",su);
-  $("segLogin").classList.toggle("on",!su);
-  $("authTitle").textContent=su?"Înscrie-te":"Bine ai revenit";
-  $("authHint").textContent=su?"Prima dată îți faci cont și îți alegi un nume — ăla apare în clasament.":"Intră cu emailul și parola cu care te-ai înregistrat.";
-  $("nameField").classList.toggle("hidden",!su);
-  $("authBtn").textContent=su?"Creează cont":"Intră";
-  clearMsg();
-}
-$("segSignup").addEventListener("click",()=>setMode("signup"));
-$("segLogin").addEventListener("click",()=>setMode("login"));
-function showErr(m){$("authErr").textContent=m;$("authErr").style.display="block";$("authOk").style.display="none";}
-function showOk(m){$("authOk").textContent=m;$("authOk").style.display="block";$("authErr").style.display="none";}
-function clearMsg(){$("authErr").style.display="none";$("authOk").style.display="none";}
-
-$("authBtn").addEventListener("click",async()=>{
-  clearMsg();
-  if(isFileProto){showErr("Ai deschis fișierul direct de pe calculator (file://). Autentificarea merge doar când site-ul e online (Netlify). Vezi ghidul.");return;}
-  const email=$("email").value.trim(), pass=$("password").value;
-  if(!email||!pass){showErr("Completează email și parolă.");return;}
-  if(pass.length<6){showErr("Parola trebuie să aibă minim 6 caractere.");return;}
-  $("authBtn").disabled=true;const orig=$("authBtn").textContent;$("authBtn").textContent="Se procesează...";
-  try{
-    if(mode==="signup"){
-      const name=$("displayName").value.trim();
-      if(!name){showErr("Alege un nume de afișare.");return;}
-      const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{display_name:name}}});
-      if(error){
-        if(/already registered|already exists/i.test(error.message)) showErr("Există deja un cont cu acest email. Apasă pe ‘Am deja cont’.");
-        else showErr(error.message);
-        return;
-      }
-      if(data.session) return;
-      const {error:le}=await sb.auth.signInWithPassword({email,password:pass});
-      if(le){showOk("Cont creat! Dacă ți se cere confirmare pe email, confirm-o și intră. (Sau dezactivează ‘Confirm email’ în Supabase.)");setMode("login");return;}
-    }else{
-      const {error}=await sb.auth.signInWithPassword({email,password:pass});
-      if(error){
-        if(/Email not confirmed/i.test(error.message)) showErr("Contul nu e confirmat. Confirmă emailul SAU dezactivează ‘Confirm email’ în Supabase.");
-        else showErr("Email sau parolă greșite.");
-        return;
-      }
+    /* ---------- AUTH UI ---------- */
+    function setMode(m){
+        mode=m;const su=m==="signup";
+        $("segSignup").classList.toggle("on",su);
+        $("segLogin").classList.toggle("on",!su);
+        $("authTitle").textContent=su?"Înscrie-te":"Bine ai revenit";
+        $("authHint").textContent=su?"Prima dată îți faci cont și îți alegi un nume — ăla apare în clasament.":"Intră cu emailul și parola cu care te-ai înregistrat.";
+        $("nameField").classList.toggle("hidden",!su);
+        $("authBtn").textContent=su?"Creează cont":"Intră";
+        clearMsg();
     }
-  }catch(e){showErr("Eroare de conexiune: "+e.message);}
-  finally{$("authBtn").disabled=false;$("authBtn").textContent=orig;}
-});
-$("logoutBtn").addEventListener("click",async()=>{await sb.auth.signOut();location.reload();});
+    $("segSignup").addEventListener("click",()=>setMode("signup"));
+    $("segLogin").addEventListener("click",()=>setMode("login"));
+    function showErr(m){$("authErr").textContent=m;$("authErr").style.display="block";$("authOk").style.display="none";}
+    function showOk(m){$("authOk").textContent=m;$("authOk").style.display="block";$("authErr").style.display="none";}
+    function clearMsg(){$("authErr").style.display="none";$("authOk").style.display="none";}
 
-sb.auth.onAuthStateChange((_e,session)=>{
-  if(session&&session.user) onLogin(session.user); else showAuth();
-});
+    $("authBtn").addEventListener("click",async()=>{
+        clearMsg();
+        if(isFileProto){showErr("Ai deschis fișierul direct de pe calculator (file://). Autentificarea merge doar când site-ul e online (Netlify). Vezi ghidul.");return;}
+        const email=$("email").value.trim(), pass=$("password").value;
+        if(!email||!pass){showErr("Completează email și parolă.");return;}
+        if(pass.length<6){showErr("Parola trebuie să aibă minim 6 caractere.");return;}
+        $("authBtn").disabled=true;const orig=$("authBtn").textContent;$("authBtn").textContent="Se procesează...";
+        try{
+            if(mode==="signup"){
+                const name=$("displayName").value.trim();
+                if(!name){showErr("Alege un nume de afișare.");return;}
+                const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{display_name:name}}});
+                if(error){
+                    if(/already registered|already exists/i.test(error.message)) showErr("Există deja un cont cu acest email. Apasă pe ‘Am deja cont’.");
+                    else showErr(error.message);
+                    return;
+                }
+                if(data.session) return;
+                const {error:le}=await sb.auth.signInWithPassword({email,password:pass});
+                if(le){showOk("Cont creat! Dacă ți se cere confirmare pe email, confirm-o și intră. (Sau dezactivează ‘Confirm email’ în Supabase.)");setMode("login");return;}
+            }else{
+                const {error}=await sb.auth.signInWithPassword({email,password:pass});
+                if(error){
+                    if(/Email not confirmed/i.test(error.message)) showErr("Contul nu e confirmat. Confirmă emailul SAU dezactivează ‘Confirm email’ în Supabase.");
+                    else showErr("Email sau parolă greșite.");
+                    return;
+                }
+            }
+        }catch(e){showErr("Eroare de conexiune: "+e.message);}
+        finally{$("authBtn").disabled=false;$("authBtn").textContent=orig;}
+    });
+    $("logoutBtn").addEventListener("click",async()=>{await sb.auth.signOut();location.reload();});
 
-async function onLogin(user){
-  const name=user.user_metadata?.display_name || user.email.split("@")[0];
-  me={id:user.id,name,email:user.email};
-  $("authScreen").classList.add("hidden");
-  $("appScreen").classList.remove("hidden");
-  $("userName").innerHTML=me.name;
-  $("userEmail").textContent=me.email;
-  $("userAv").textContent=me.name[0].toUpperCase();
-  await checkAdmin();
-  if(isAdmin) $("userName").innerHTML=me.name+'<span class="adminbadge">Admin</span>';
-  await Promise.all([loadMyPicks(),loadResults()]);
-  buildNav();render();
-}
-function showAuth(){me=null;isAdmin=false;$("appScreen").classList.add("hidden");$("authScreen").classList.remove("hidden");}
+    sb.auth.onAuthStateChange((_e,session)=>{
+        if(session&&session.user) onLogin(session.user); else showAuth();
+    });
 
-async function checkAdmin(){
-  const {data}=await sb.from("admins").select("user_id").eq("user_id",me.id).maybeSingle();
-  isAdmin=!!data;
-}
-
-/* ---------- GATING ---------- */
-function matchLocked(m){return new Date()>=new Date(m.ko);}
-function stageUnlocked(md){if(md===1)return true;const prev=STAGES.find(s=>s.md===md-1);return new Date()>=new Date(prev.opensAt);}
-
-/* ---------- DATA ---------- */
-async function loadMyPicks(){
-  myPicks={};
-  const {data}=await sb.from("predictions").select("*").eq("user_id",me.id);
-  if(data) data.forEach(p=>{myPicks[p.match_id]={home:p.home_score,away:p.away_score};});
-}
-async function loadResults(){
-  results={};
-  const {data}=await sb.from("results").select("*");
-  if(data) data.forEach(r=>{results[r.match_id]={home:r.home_score,away:r.away_score};});
-}
-
-/* points for a pick vs a real result */
-function ptsFor(pick, real){
-  if(!pick||!real) return null;
-  if(pick.home===real.home&&pick.away===real.away) return 3;
-  const sg=(h,a)=>h>a?1:h<a?-1:0;
-  return sg(pick.home,pick.away)===sg(real.home,real.away)?1:0;
-}
-
-/* ---------- NAV ---------- */
-function buildNav(){
-  const n=$("stagenav");n.innerHTML="";
-  STAGES.forEach(s=>{
-    const un=stageUnlocked(s.md);
-    const b=document.createElement("button");
-    b.className="snav"+(activeTab===s.md?" on":"")+(un?"":" locked");
-    b.innerHTML='<span class="big">Etapa '+s.md+'</span><span class="sm">'+(un?'Grupe':'🔒 Blocat')+'</span>';
-    if(un) b.addEventListener("click",()=>{activeTab=s.md;buildNav();render();});
-    n.appendChild(b);
-  });
-  const lb=document.createElement("button");
-  lb.className="snav"+(activeTab==="lb"?" on":"");
-  lb.innerHTML='<span class="big">🏆 Clasament</span><span class="sm">Top jucători</span>';
-  lb.addEventListener("click",()=>{activeTab="lb";buildNav();render();});
-  n.appendChild(lb);
-  if(isAdmin){
-    const ad=document.createElement("button");
-    ad.className="snav admin"+(activeTab==="admin"?" on":"");
-    ad.innerHTML='<span class="big">⚙ Rezultate</span><span class="sm">Doar admin</span>';
-    ad.addEventListener("click",()=>{activeTab="admin";buildNav();render();});
-    n.appendChild(ad);
-  }
-}
-
-function render(){
-  if(activeTab==="lb") return renderLeaderboard();
-  if(activeTab==="admin") return renderAdmin();
-  renderStage(activeTab);
-}
-
-/* ---------- PLAYER: STAGE (predictions) ---------- */
-function renderStage(md){
-  const c=$("content");
-  if(!stageUnlocked(md)){
-    c.innerHTML='<div class="center-msg"><span class="ic">🔒</span>Etapa '+md+' se deschide automat după ce începe Etapa '+(md-1)+'.<br>Concentrează-te pe etapa curentă deocamdată!</div>';
-    return;
-  }
-  const matches=MATCHES.filter(m=>m.md===md);
-  const byGroup={};matches.forEach(m=>{(byGroup[m.group]=byGroup[m.group]||[]).push(m);});
-  const allLocked=matches.every(matchLocked);
-
-  let html='<div class="banner'+(allLocked?' closed':'')+'"><span class="pulse"></span>'+
-    (allLocked?'Etapa '+md+' s-a închis. Pronosticurile sunt blocate — verifică clasamentul.'
-              :'Pune scorul exact la fiecare meci. Fiecare meci se blochează la fluierul de start.')+'</div>';
-  Object.keys(byGroup).sort().forEach(g=>{html+=renderGroup(g,byGroup[g]);});
-  html+='<div class="savebar"><span id="saveStatus">Apasă ‘Salvează’ ca să trimiți pronosticurile.</span><button class="btn" id="saveBtn" type="button">Salvează tot</button></div>';
-  c.innerHTML=html;
-  c.querySelectorAll(".match input").forEach(inp=>inp.addEventListener("input",()=>{$("saveStatus").textContent="Ai modificări nesalvate...";}));
-  $("saveBtn").addEventListener("click",savePicks);
-}
-
-function renderGroup(g, matches){
-  // LIVE standings computed from REAL results entered by admin
-  const table=computeGroupStandings(g);
-  let rows='';
-  table.forEach((row,i)=>{
-    rows+='<tr class="'+(i<2?'qual':'')+'">'+
-      '<td class="lt"><span class="pos">'+(i+1)+'</span></td>'+
-      '<td class="lt team"><span class="fl">'+fl(row.team)+'</span>'+row.team+'</td>'+
-      '<td class="hd">'+row.p+'</td><td class="hd">'+row.w+'</td><td class="hd">'+row.d+'</td><td class="hd">'+row.l+'</td>'+
-      '<td class="ptcol"><b>'+row.pts+'</b></td></tr>';
-  });
-  let mhtml='';
-  matches.forEach(m=>{
-    const locked=matchLocked(m);
-    const p=myPicks[m.id]||{};
-    const has=p.home!=null&&p.away!=null;
-    const real=results[m.id];
-    const earned=has&&real?ptsFor(p,real):null;
-    const d=new Date(m.ko);
-    const dstr=d.toLocaleDateString("ro-RO",{weekday:"short",day:"numeric",month:"short"})+" · "+d.toLocaleTimeString("ro-RO",{hour:"2-digit",minute:"2-digit"});
-    let headRight='';
-    if(real) headRight='<span class="finalscore">FINAL '+real.home+'–'+real.away+'</span>';
-    else if(locked) headRight='<span class="lockicon">🔒 BLOCAT</span>';
-    let predLine='';
-    if(has){
-      let badge='';
-      if(earned===3) badge='<span class="ptearned p3">+3 PCT</span>';
-      else if(earned===1) badge='<span class="ptearned p1">+1 PCT</span>';
-      else if(earned===0) badge='<span class="ptearned p0">0 PCT</span>';
-      predLine='Pronosticul tău: '+p.home+'–'+p.away+badge;
+    async function onLogin(user){
+        const name=user.user_metadata?.display_name || user.email.split("@")[0];
+        me={id:user.id,name,email:user.email};
+        $("authScreen").classList.add("hidden");
+        $("appScreen").classList.remove("hidden");
+        $("userName").innerHTML=me.name;
+        $("userEmail").textContent=me.email;
+        $("userAv").textContent=me.name[0].toUpperCase();
+        await checkAdmin();
+        if(isAdmin) $("userName").innerHTML=me.name+'<span class="adminbadge">Admin</span>';
+        await Promise.all([loadMyPicks(),loadResults()]);
+        buildNav();render();
     }
-    mhtml+=
-    '<div class="match'+(locked?' locked':'')+(has?' haspick':'')+(real?' scored':'')+'" data-id="'+m.id+'">'+
-      '<div class="mhead"><span class="dt">'+dstr+'</span>'+headRight+'</div>'+
-      '<div class="mrow">'+
-        '<div class="tm-side"><span class="fl">'+fl(m.home)+'</span><span class="nm">'+m.home+'</span><input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="home" value="'+(p.home??"")+'" '+(locked?'disabled':'')+'/></div>'+
-        '<div class="tm-side away"><span class="fl">'+fl(m.away)+'</span><span class="nm">'+m.away+'</span><input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="away" value="'+(p.away??"")+'" '+(locked?'disabled':'')+'/></div>'+
-      '</div>'+
-        '<div class="tm-side away"><span class="nm">'+m.away+'</span><span class="fl">'+fl(m.away)+'</span></div>'+
-      '</div>'+
-      '<div class="predicted">'+predLine+'</div>'+
-    '</div>';
-  });
-  return '<div class="group">'+
-    '<div class="group-head"><div class="gbadge">'+g+'</div><div class="gt">Grupa '+g+'</div><div class="gc">4 echipe · primele 2 avansează</div></div>'+
-    '<div class="standings"><table>'+
-      '<thead><tr><th class="lt" colspan="2">Echipă</th><th class="hd">J</th><th class="hd">V</th><th class="hd">E</th><th class="hd">Î</th><th>P</th></tr></thead>'+
-      '<tbody>'+rows+'</tbody></table></div>'+
-    '<div class="matches">'+mhtml+'</div>'+
-  '</div>';
-}
+    function showAuth(){me=null;isAdmin=false;$("appScreen").classList.add("hidden");$("authScreen").classList.remove("hidden");}
 
-/* compute real group standings from results{} */
-function computeGroupStandings(g){
-  const st={};
-  GROUPS[g].forEach(t=>st[t]={team:t,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});
-  MATCHES.filter(m=>m.group===g).forEach(m=>{
-    const r=results[m.id];if(!r)return;
-    const H=st[m.home],A=st[m.away];if(!H||!A)return;
-    H.p++;A.p++;H.gf+=r.home;H.ga+=r.away;A.gf+=r.away;A.ga+=r.home;
-    if(r.home>r.away){H.w++;A.l++;H.pts+=3;}
-    else if(r.home<r.away){A.w++;H.l++;A.pts+=3;}
-    else{H.d++;A.d++;H.pts++;A.pts++;}
-  });
-  return Object.values(st).sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf);
-}
+    async function checkAdmin(){
+        const {data}=await sb.from("admins").select("user_id").eq("user_id",me.id).maybeSingle();
+        isAdmin=!!data;
+    }
 
-async function savePicks(){
-  const rows=[];
-  document.querySelectorAll(".match").forEach(card=>{
-    const hi=card.querySelector('input[data-s=home]'),ai=card.querySelector('input[data-s=away]');
-    if(hi.disabled) return;
-    if(hi.value!==""&&ai.value!=="") rows.push({user_id:me.id,user_name:me.name,match_id:card.dataset.id,home_score:parseInt(hi.value),away_score:parseInt(ai.value)});
-  });
-  if(rows.length===0){$("saveStatus").textContent="Nimic de salvat.";return;}
-  $("saveBtn").disabled=true;$("saveBtn").textContent="Se salvează...";
-  const {error}=await sb.from("predictions").upsert(rows,{onConflict:"user_id,match_id"});
-  $("saveBtn").disabled=false;$("saveBtn").textContent="Salvează tot";
-  if(error){$("saveStatus").textContent="Eroare: "+error.message;return;}
-  rows.forEach(r=>{myPicks[r.match_id]={home:r.home_score,away:r.away_score};});
-  $("saveStatus").textContent="✅ Salvat! ("+rows.length+" pronosticuri)";
-  render();
-}
+    /* ---------- GATING ---------- */
+    function matchLocked(m){return new Date()>=new Date(m.ko);}
+    function stageUnlocked(md){if(md===1)return true;const prev=STAGES.find(s=>s.md===md-1);return new Date()>=new Date(prev.opensAt);}
 
-/* ---------- ADMIN: enter REAL results ---------- */
-function renderAdmin(){
-  const c=$("content");
-  let html='<div class="banner info"><span class="pulse"></span>Panou ADMIN — introdu scorurile REALE. Acestea calculează automat clasamentul și clasamentul grupelor. Doar tu vezi acest tab.</div>';
-  STAGES.forEach(s=>{
-    const matches=MATCHES.filter(m=>m.md===s.md);
-    const byGroup={};matches.forEach(m=>{(byGroup[m.group]=byGroup[m.group]||[]).push(m);});
-    html+='<div class="group"><div class="group-head"><div class="gbadge">'+s.md+'</div><div class="gt">Etapa '+s.md+'</div><div class="gc">rezultate reale</div></div><div class="matches">';
-    Object.keys(byGroup).sort().forEach(g=>{
-      byGroup[g].forEach(m=>{
-        const real=results[m.id]||{};
-        const has=real.home!=null;
-        const d=new Date(m.ko);
-        const dstr="Gr."+g+" · "+d.toLocaleDateString("ro-RO",{day:"numeric",month:"short"});
-        html+=
-        '<div class="match'+(has?' scored':'')+'" data-id="'+m.id+'">'+
-          '<div class="mhead"><span class="dt">'+dstr+'</span>'+(has?'<span class="finalscore">SALVAT '+real.home+'–'+real.away+'</span>':'')+'</div>'+
-          '<div class="mrow">'+
-            '<div class="tm-side adm"><span class="fl">'+fl(m.home)+'</span><span class="nm">'+m.home+'</span><input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="home" value="'+(real.home??"")+'"/></div>'+
-            '<div class="tm-side away adm"><span class="fl">'+fl(m.away)+'</span><span class="nm">'+m.away+'</span><input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="away" value="'+(real.away??"")+'"/></div>'+
-          '</div>'+
-        '</div>';
-      });
-    });
-    html+='</div></div>';
-  });
-  html+='<div class="savebar"><span id="saveStatus">Completează doar meciurile jucate. Restul lasă-le goale.</span><button class="btn adm" id="saveResBtn" type="button">Salvează rezultatele</button></div>';
-  c.innerHTML=html;
-  c.querySelectorAll(".match input").forEach(inp=>inp.addEventListener("input",()=>{$("saveStatus").textContent="Ai modificări nesalvate...";}));
-  $("saveResBtn").addEventListener("click",saveResults);
-}
+    /* ---------- DATA ---------- */
+    async function loadMyPicks(){
+        myPicks={};
+        const {data}=await sb.from("predictions").select("*").eq("user_id",me.id);
+        if(data) data.forEach(p=>{myPicks[p.match_id]={home:p.home_score,away:p.away_score};});
+    }
+    async function loadResults(){
+        results={};
+        const {data}=await sb.from("results").select("*");
+        if(data) data.forEach(r=>{results[r.match_id]={home:r.home_score,away:r.away_score};});
+    }
 
-async function saveResults(){
-  const rows=[];
-  document.querySelectorAll(".match").forEach(card=>{
-    const hi=card.querySelector('input[data-s=home]'),ai=card.querySelector('input[data-s=away]');
-    if(hi.value!==""&&ai.value!=="") rows.push({match_id:card.dataset.id,home_score:parseInt(hi.value),away_score:parseInt(ai.value),updated_by:me.id});
-  });
-  if(rows.length===0){$("saveStatus").textContent="Nimic de salvat.";return;}
-  $("saveResBtn").disabled=true;$("saveResBtn").textContent="Se salvează...";
-  const {error}=await sb.from("results").upsert(rows,{onConflict:"match_id"});
-  $("saveResBtn").disabled=false;$("saveResBtn").textContent="Salvează rezultatele";
-  if(error){$("saveStatus").textContent="Eroare: "+error.message+" (ești sigur că ești admin?)";return;}
-  await loadResults();
-  $("saveStatus").textContent="✅ Salvat! Clasamentul s-a actualizat. ("+rows.length+" rezultate)";
-  render();
-}
+    /* points for a pick vs a real result */
+    function ptsFor(pick, real){
+        if(!pick||!real) return null;
+        if(pick.home===real.home&&pick.away===real.away) return 3;
+        const sg=(h,a)=>h>a?1:h<a?-1:0;
+        return sg(pick.home,pick.away)===sg(real.home,real.away)?1:0;
+    }
 
-/* ---------- LEADERBOARD with full stats ---------- */
-async function renderLeaderboard(){
-  const c=$("content");
-  c.innerHTML='<div class="loader"><div class="spinner"></div>Calculez clasamentul...</div>';
-  await loadResults();
-  const {data:allPicks,error}=await sb.from("predictions").select("user_id,user_name,match_id,home_score,away_score");
-  if(error){c.innerHTML='<div class="center-msg">Eroare: '+error.message+'</div>';return;}
+    /* ---------- NAV ---------- */
+    function buildNav(){
+        const n=$("stagenav");n.innerHTML="";
+        STAGES.forEach(s=>{
+            const un=stageUnlocked(s.md);
+            const b=document.createElement("button");
+            b.className="snav"+(activeTab===s.md?" on":"")+(un?"":" locked");
+            b.innerHTML='<span class="big">Etapa '+s.md+'</span><span class="sm">'+(un?'Grupe':'🔒 Blocat')+'</span>';
+            if(un) b.addEventListener("click",()=>{activeTab=s.md;buildNav();render();});
+            n.appendChild(b);
+        });
+        const lb=document.createElement("button");
+        lb.className="snav"+(activeTab==="lb"?" on":"");
+        lb.innerHTML='<span class="big">🏆 Clasament</span><span class="sm">Top jucători</span>';
+        lb.addEventListener("click",()=>{activeTab="lb";buildNav();render();});
+        n.appendChild(lb);
+        if(isAdmin){
+            const ad=document.createElement("button");
+            ad.className="snav admin"+(activeTab==="admin"?" on":"");
+            ad.innerHTML='<span class="big">⚙ Rezultate</span><span class="sm">Doar admin</span>';
+            ad.addEventListener("click",()=>{activeTab="admin";buildNav();render();});
+            n.appendChild(ad);
+        }
+    }
 
-  // chronological list of scored matches (by kickoff) for "form"
-  const scoredMatchIds = MATCHES.filter(m=>results[m.id]).sort((a,b)=>new Date(a.ko)-new Date(b.ko)).map(m=>m.id);
+    function render(){
+        if(activeTab==="lb") return renderLeaderboard();
+        if(activeTab==="admin") return renderAdmin();
+        renderStage(activeTab);
+    }
 
-  const S={};
-  (allPicks||[]).forEach(p=>{
-    if(!S[p.user_id]) S[p.user_id]={name:p.user_name,pts:0,exact:0,res:0,wrong:0,total:0,scored:0,byMatch:{}};
-    S[p.user_id].total++;
-    S[p.user_id].byMatch[p.match_id]={home:p.home_score,away:p.away_score};
-    const real=results[p.match_id];if(!real)return;
-    S[p.user_id].scored++;
-    const e=ptsFor({home:p.home_score,away:p.away_score},real);
-    if(e===3){S[p.user_id].pts+=3;S[p.user_id].exact++;}
-    else if(e===1){S[p.user_id].pts+=1;S[p.user_id].res++;}
-    else{S[p.user_id].wrong++;}
-  });
+    /* ---------- PLAYER: STAGE (predictions) ---------- */
+    function renderStage(md){
+        const c=$("content");
+        if(!stageUnlocked(md)){
+            c.innerHTML='<div class="center-msg"><span class="ic">🔒</span>Etapa '+md+' se deschide automat după ce începe Etapa '+(md-1)+'.<br>Concentrează-te pe etapa curentă deocamdată!</div>';
+            return;
+        }
+        const matches=MATCHES.filter(m=>m.md===md);
+        const byGroup={};matches.forEach(m=>{(byGroup[m.group]=byGroup[m.group]||[]).push(m);});
+        const allLocked=matches.every(matchLocked);
 
-  const arr=Object.entries(S).map(([id,v])=>{
-    const acc=v.scored?Math.round(((v.exact+v.res)/v.scored)*100):0;
-    // form: last up to 6 scored matches
-    const form=scoredMatchIds.slice(-6).map(mid=>{
-      const pk=v.byMatch[mid];if(!pk)return -1;return ptsFor(pk,results[mid]);
-    });
-    return {id,...v,acc,form};
-  }).sort((a,b)=>b.pts-a.pts||b.exact-a.exact||b.acc-a.acc);
+        let html='<div class="banner'+(allLocked?' closed':'')+'"><span class="pulse"></span>'+
+            (allLocked?'Etapa '+md+' s-a închis. Pronosticurile sunt blocate — verifică clasamentul.'
+                :'Pune scorul exact la fiecare meci. Fiecare meci se blochează la fluierul de start.')+'</div>';
+        Object.keys(byGroup).sort().forEach(g=>{html+=renderGroup(g,byGroup[g]);});
+        html+='<div class="savebar"><span id="saveStatus">Apasă ‘Salvează’ ca să trimiți pronosticurile.</span><button class="btn" id="saveBtn" type="button">Salvează tot</button></div>';
+        c.innerHTML=html;
+        c.querySelectorAll(".match input").forEach(inp=>inp.addEventListener("input",()=>{$("saveStatus").textContent="Ai modificări nesalvate...";}));
+        $("saveBtn").addEventListener("click",savePicks);
+    }
 
-  let html='<div class="lb-title">Clasament General<span class="sub">PREDICTOR LEAGUE · CM 2026</span></div>';
-  if(arr.length===0){
-    html+='<div class="center-msg"><span class="ic">⚽</span>Încă nimeni n-a pus pronosticuri.<br>Fii primul care intră în istorie!</div>';
-    html+=scoringBox();c.innerHTML=html;return;
-  }
-  const anyResults=scoredMatchIds.length>0;
-  if(!anyResults) html+='<div class="banner info"><span class="pulse"></span>Punctele apar după ce adminul introduce rezultatele reale. Momentan se afișează doar cine a pariat.</div>';
+    function renderGroup(g, matches){
+        // LIVE standings computed from REAL results entered by admin
+        const table=computeGroupStandings(g);
+        let rows='';
+        table.forEach((row,i)=>{
+            rows+='<tr class="'+(i<2?'qual':'')+'">'+
+                '<td class="lt"><span class="pos">'+(i+1)+'</span></td>'+
+                '<td class="lt team"><span class="fl">'+fl(row.team)+'</span>'+row.team+'</td>'+
+                '<td class="hd">'+row.p+'</td><td class="hd">'+row.w+'</td><td class="hd">'+row.d+'</td><td class="hd">'+row.l+'</td>'+
+                '<td class="ptcol"><b>'+row.pts+'</b></td></tr>';
+        });
+        let mhtml='';
+        matches.forEach(m=>{
+            const locked=matchLocked(m);
+            const p=myPicks[m.id]||{};
+            const has=p.home!=null&&p.away!=null;
+            const real=results[m.id];
+            const earned=has&&real?ptsFor(p,real):null;
+            const d=new Date(m.ko);
+            const dstr=d.toLocaleDateString("ro-RO",{weekday:"short",day:"numeric",month:"short"})+" · "+d.toLocaleTimeString("ro-RO",{hour:"2-digit",minute:"2-digit"});
+            let headRight='';
+            if(real) headRight='<span class="finalscore">FINAL '+real.home+'–'+real.away+'</span>';
+            else if(locked) headRight='<span class="lockicon">🔒 BLOCAT</span>';
+            let predLine='';
+            if(has){
+                let badge='';
+                if(earned===3) badge='<span class="ptearned p3">+3 PCT</span>';
+                else if(earned===1) badge='<span class="ptearned p1">+1 PCT</span>';
+                else if(earned===0) badge='<span class="ptearned p0">0 PCT</span>';
+                predLine='Pronosticul tău: '+p.home+'–'+p.away+badge;
+            }
+            mhtml+=
+                '<div class="match'+(locked?' locked':'')+(has?' haspick':'')+(real?' scored':'')+'" data-id="'+m.id+'">'+
+                '<div class="mhead"><span class="dt">'+dstr+'</span>'+headRight+'</div>'+
+                '<div class="mrow">'+
+                '<div class="tm-side"><span class="fl">'+fl(m.home)+'</span><span class="nm">'+m.home+'</span><input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="home" value="'+(p.home??"")+'" '+(locked?'disabled':'')+'/></div>'+
+                '<div class="tm-side away"><span class="fl">'+fl(m.away)+'</span><span class="nm">'+m.away+'</span><input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="away" value="'+(p.away??"")+'" '+(locked?'disabled':'')+'/></div>'+
+                '</div>'+
+                '<div class="predicted">'+predLine+'</div>'+
+                '</div>';
+        });
+        return '<div class="group">'+
+            '<div class="group-head"><div class="gbadge">'+g+'</div><div class="gt">Grupa '+g+'</div><div class="gc">4 echipe · primele 2 avansează</div></div>'+
+            '<div class="standings"><table>'+
+            '<thead><tr><th class="lt" colspan="2">Echipă</th><th class="hd">J</th><th class="hd">V</th><th class="hd">E</th><th class="hd">Î</th><th>P</th></tr></thead>'+
+            '<tbody>'+rows+'</tbody></table></div>'+
+            '<div class="matches">'+mhtml+'</div>'+
+            '</div>';
+    }
 
-  // PODIUM (top 3) — only meaningful with results, but show anyway
-  if(arr.length>=3){
-    const order=[arr[1],arr[0],arr[2]]; // 2nd, 1st, 3rd visual
-    const cls=['p2','p1','p3'],med=['🥈','🥇','🥉'];
-    html+='<div class="podium">';
-    order.forEach((u,idx)=>{
-      html+='<div class="pod '+cls[idx]+'"><div class="medal">'+med[idx]+'</div>'+
-        '<div class="pav">'+u.name[0].toUpperCase()+'</div>'+
-        '<div class="pn">'+u.name+(u.id===me.id?' (tu)':'')+'</div>'+
-        '<div class="pp">'+u.pts+'<small>pct</small></div></div>';
-    });
-    html+='</div>';
-  }
+    /* compute real group standings from results{} */
+    function computeGroupStandings(g){
+        const st={};
+        GROUPS[g].forEach(t=>st[t]={team:t,p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});
+        MATCHES.filter(m=>m.group===g).forEach(m=>{
+            const r=results[m.id];if(!r)return;
+            const H=st[m.home],A=st[m.away];if(!H||!A)return;
+            H.p++;A.p++;H.gf+=r.home;H.ga+=r.away;A.gf+=r.away;A.ga+=r.home;
+            if(r.home>r.away){H.w++;A.l++;H.pts+=3;}
+            else if(r.home<r.away){A.w++;H.l++;A.pts+=3;}
+            else{H.d++;A.d++;H.pts++;A.pts++;}
+        });
+        return Object.values(st).sort((a,b)=>b.pts-a.pts||(b.gf-b.ga)-(a.gf-a.ga)||b.gf-a.gf);
+    }
 
-  html+='<div class="lb">'+
-    '<div class="lb-head"><span class="lt">#  Jucător</span><span class="hd-ex">Exact</span><span class="hd-co">Rez.</span><span>Acc</span><span>Pct</span></div>';
-  arr.forEach((u,i)=>{
-    const r=i+1;const cls=r===1?'g':r===2?'s':r===3?'b':'';const medal=r===1?'🥇':r===2?'🥈':r===3?'🥉':r;
-    let formHtml='';
-    if(anyResults){formHtml='<div class="lb-form">'+u.form.map(f=>f<0?'<span class="fdot f0"></span>':'<span class="fdot f'+f+'"></span>').join('')+'</div>';}
-    html+='<div class="lb-row'+(u.id===me.id?' me':'')+'">'+
-      '<div class="rk '+cls+'">'+medal+'</div>'+
-      '<div class="lb-name"><span class="av">'+u.name[0].toUpperCase()+'</span><span class="nm">'+u.name+'</span>'+(u.id===me.id?' <span class="tagme">TU</span>':'')+formHtml+'</div>'+
-      '<div class="lb-cell hd-ex">'+u.exact+'</div>'+
-      '<div class="lb-cell hd-co">'+u.res+'</div>'+
-      '<div class="lb-cell mut">'+u.acc+'%</div>'+
-      '<div class="lb-pts">'+u.pts+'</div>'+
-    '</div>';
-  });
-  html+='</div>';
-  html+=scoringBox();
-  c.innerHTML=html;
-}
-function scoringBox(){
-  return '<div class="scoring"><span class="h">Sistem de punctare</span>'+
-    '🎯 Scor exact ghicit = <b>3 puncte</b><br>'+
-    '✅ Doar rezultatul corect (1 / X / 2) = <b>1 punct</b><br>'+
-    '❌ Greșit = 0 puncte<br><br>'+
-    '<span style="font-size:12px;color:var(--mut2)">Coloana <b style="color:var(--mut)">Acc</b> = acuratețe (% pronosticuri cu puncte). Bulinele = forma la ultimele meciuri (🟢 exact · 🟡 rezultat · ⚫ greșit).</span></div>';
-}
+    async function savePicks(){
+        const rows=[];
+        document.querySelectorAll(".match").forEach(card=>{
+            const hi=card.querySelector('input[data-s=home]'),ai=card.querySelector('input[data-s=away]');
+            if(hi.disabled) return;
+            if(hi.value!==""&&ai.value!=="") rows.push({user_id:me.id,user_name:me.name,match_id:card.dataset.id,home_score:parseInt(hi.value),away_score:parseInt(ai.value)});
+        });
+        if(rows.length===0){$("saveStatus").textContent="Nimic de salvat.";return;}
+        $("saveBtn").disabled=true;$("saveBtn").textContent="Se salvează...";
+        const {error}=await sb.from("predictions").upsert(rows,{onConflict:"user_id,match_id"});
+        $("saveBtn").disabled=false;$("saveBtn").textContent="Salvează tot";
+        if(error){$("saveStatus").textContent="Eroare: "+error.message;return;}
+        rows.forEach(r=>{myPicks[r.match_id]={home:r.home_score,away:r.away_score};});
+        $("saveStatus").textContent="✅ Salvat! ("+rows.length+" pronosticuri)";
+        render();
+    }
 
-/* ---------- INIT ---------- */
-setMode("signup");
-(async()=>{
-  const {data}=await sb.auth.getSession();
-  if(data.session&&data.session.user) onLogin(data.session.user); else showAuth();
-})();
+    /* ---------- ADMIN: enter REAL results ---------- */
+    function renderAdmin(){
+        const c=$("content");
+        let html='<div class="banner info"><span class="pulse"></span>Panou ADMIN — introdu scorurile REALE. Acestea calculează automat clasamentul și clasamentul grupelor. Doar tu vezi acest tab.</div>';
+        STAGES.forEach(s=>{
+            const matches=MATCHES.filter(m=>m.md===s.md);
+            const byGroup={};matches.forEach(m=>{(byGroup[m.group]=byGroup[m.group]||[]).push(m);});
+            html+='<div class="group"><div class="group-head"><div class="gbadge">'+s.md+'</div><div class="gt">Etapa '+s.md+'</div><div class="gc">rezultate reale</div></div><div class="matches">';
+            Object.keys(byGroup).sort().forEach(g=>{
+                byGroup[g].forEach(m=>{
+                    const real=results[m.id]||{};
+                    const has=real.home!=null;
+                    const d=new Date(m.ko);
+                    const dstr="Gr."+g+" · "+d.toLocaleDateString("ro-RO",{day:"numeric",month:"short"});
+                    html+=
+                        '<div class="match'+(has?' scored':'')+'" data-id="'+m.id+'">'+
+                        '<div class="mhead"><span class="dt">'+dstr+'</span>'+(has?'<span class="finalscore">SALVAT '+real.home+'–'+real.away+'</span>':'')+'</div>'+
+                        '<div class="mrow">'+
+                        '<div class="tm-side adm"><span class="fl">'+fl(m.home)+'</span><span class="nm">'+m.home+'</span><input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="home" value="'+(real.home??"")+'"/></div>'+
+                        '<div class="tm-side away adm"><span class="fl">'+fl(m.away)+'</span><span class="nm">'+m.away+'</span><input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="away" value="'+(real.away??"")+'"/></div>'+
+                        '</div>'+
+                        '</div>';
+                });
+            });
+            html+='</div></div>';
+        });
+        html+='<div class="savebar"><span id="saveStatus">Completează doar meciurile jucate. Restul lasă-le goale.</span><button class="btn adm" id="saveResBtn" type="button">Salvează rezultatele</button></div>';
+        c.innerHTML=html;
+        c.querySelectorAll(".match input").forEach(inp=>inp.addEventListener("input",()=>{$("saveStatus").textContent="Ai modificări nesalvate...";}));
+        $("saveResBtn").addEventListener("click",saveResults);
+    }
+
+    async function saveResults(){
+        const rows=[];
+        document.querySelectorAll(".match").forEach(card=>{
+            const hi=card.querySelector('input[data-s=home]'),ai=card.querySelector('input[data-s=away]');
+            if(hi.value!==""&&ai.value!=="") rows.push({match_id:card.dataset.id,home_score:parseInt(hi.value),away_score:parseInt(ai.value),updated_by:me.id});
+        });
+        if(rows.length===0){$("saveStatus").textContent="Nimic de salvat.";return;}
+        $("saveResBtn").disabled=true;$("saveResBtn").textContent="Se salvează...";
+        const {error}=await sb.from("results").upsert(rows,{onConflict:"match_id"});
+        $("saveResBtn").disabled=false;$("saveResBtn").textContent="Salvează rezultatele";
+        if(error){$("saveStatus").textContent="Eroare: "+error.message+" (ești sigur că ești admin?)";return;}
+        await loadResults();
+        $("saveStatus").textContent="✅ Salvat! Clasamentul s-a actualizat. ("+rows.length+" rezultate)";
+        render();
+    }
+
+    /* ---------- LEADERBOARD with full stats ---------- */
+    async function renderLeaderboard(){
+        const c=$("content");
+        c.innerHTML='<div class="loader"><div class="spinner"></div>Calculez clasamentul...</div>';
+        await loadResults();
+        const {data:allPicks,error}=await sb.from("predictions").select("user_id,user_name,match_id,home_score,away_score");
+        if(error){c.innerHTML='<div class="center-msg">Eroare: '+error.message+'</div>';return;}
+
+        // chronological list of scored matches (by kickoff) for "form"
+        const scoredMatchIds = MATCHES.filter(m=>results[m.id]).sort((a,b)=>new Date(a.ko)-new Date(b.ko)).map(m=>m.id);
+
+        const S={};
+        (allPicks||[]).forEach(p=>{
+            if(!S[p.user_id]) S[p.user_id]={name:p.user_name,pts:0,exact:0,res:0,wrong:0,total:0,scored:0,byMatch:{}};
+            S[p.user_id].total++;
+            S[p.user_id].byMatch[p.match_id]={home:p.home_score,away:p.away_score};
+            const real=results[p.match_id];if(!real)return;
+            S[p.user_id].scored++;
+            const e=ptsFor({home:p.home_score,away:p.away_score},real);
+            if(e===3){S[p.user_id].pts+=3;S[p.user_id].exact++;}
+            else if(e===1){S[p.user_id].pts+=1;S[p.user_id].res++;}
+            else{S[p.user_id].wrong++;}
+        });
+
+        const arr=Object.entries(S).map(([id,v])=>{
+            const acc=v.scored?Math.round(((v.exact+v.res)/v.scored)*100):0;
+            // form: last up to 6 scored matches
+            const form=scoredMatchIds.slice(-6).map(mid=>{
+                const pk=v.byMatch[mid];if(!pk)return -1;return ptsFor(pk,results[mid]);
+            });
+            return {id,...v,acc,form};
+        }).sort((a,b)=>b.pts-a.pts||b.exact-a.exact||b.acc-a.acc);
+
+        let html='<div class="lb-title">Clasament General<span class="sub">PREDICTOR LEAGUE · CM 2026</span></div>';
+        if(arr.length===0){
+            html+='<div class="center-msg"><span class="ic">⚽</span>Încă nimeni n-a pus pronosticuri.<br>Fii primul care intră în istorie!</div>';
+            html+=scoringBox();c.innerHTML=html;return;
+        }
+        const anyResults=scoredMatchIds.length>0;
+
+        // PODIUM (top 3) — only meaningful with results, but show anyway
+        if(arr.length>=3){
+            const order=[arr[1],arr[0],arr[2]]; // 2nd, 1st, 3rd visual
+            const cls=['p2','p1','p3'],med=['🥈','🥇','🥉'];
+            html+='<div class="podium">';
+            order.forEach((u,idx)=>{
+                html+='<div class="pod '+cls[idx]+'"><div class="medal">'+med[idx]+'</div>'+
+                    '<div class="pav">'+u.name[0].toUpperCase()+'</div>'+
+                    '<div class="pn">'+u.name+(u.id===me.id?' (tu)':'')+'</div>'+
+                    '<div class="pp">'+u.pts+'<small>pct</small></div></div>';
+            });
+            html+='</div>';
+        }
+
+        html+='<div class="lb">'+
+            '<div class="lb-head"><span>#</span><span class="lt">Jucător</span><span>Exact</span><span>1X2</span><span>Pct</span></div>';
+        arr.forEach((u,i)=>{
+            const r=i+1;const cls=r===1?'g':r===2?'s':r===3?'b':'';const medal=r===1?'🥇':r===2?'🥈':r===3?'🥉':r;
+            let formHtml='';
+            if(anyResults){formHtml='<div class="lb-form">'+u.form.map(f=>f<0?'<span class="fdot f0"></span>':'<span class="fdot f'+f+'"></span>').join('')+'</div>';}
+            html+='<div class="lb-row'+(u.id===me.id?' me':'')+'">'+
+                '<div class="rk '+cls+'">'+medal+'</div>'+
+                '<div class="lb-name"><span class="av">'+u.name[0].toUpperCase()+'</span><span class="nm">'+u.name+'</span>'+(u.id===me.id?' <span class="tagme">TU</span>':'')+formHtml+'</div>'+
+                '<div class="lb-cell">'+u.exact+'</div>'+
+                '<div class="lb-cell">'+u.res+'</div>'+
+                '<div class="lb-pts">'+u.pts+'</div>'+
+                '</div>';
+        });
+        html+='</div>';
+        html+=scoringBox();
+        c.innerHTML=html;
+    }
+    function scoringBox(){
+        return '<div class="scoring"><span class="h">Sistem de punctare</span>'+
+            '🎯 Scor exact ghicit = <b>3 puncte</b><br>'+
+            '✅ Doar rezultatul corect (1 / X / 2) = <b>1 punct</b><br>'+
+            '❌ Greșit = 0 puncte<br><br>'+
+            '<span style="font-size:12px;color:var(--mut2)">Coloanele: <b style="color:var(--mut)">Exact</b> = scoruri exacte ghicite · <b style="color:var(--mut)">1X2</b> = rezultate corecte (1/X/2). Bulinele = forma la ultimele meciuri (🟢 exact · 🟡 rezultat · ⚫ greșit).</span></div>';
+    }
+
+    /* ---------- INIT ---------- */
+    setMode("signup");
+    (async()=>{
+        const {data}=await sb.auth.getSession();
+        if(data.session&&data.session.user) onLogin(data.session.user); else showAuth();
+    })();
 </script>
 </body>
 </html>
