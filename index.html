@@ -103,6 +103,7 @@
         .standings td.team{display:flex;align-items:center;gap:8px}
         .standings td.team .fl{font-size:19px}
         .standings tr.qual td:first-child{box-shadow:inset 3px 0 0 var(--green)}
+        .standings tr.qual3 td:first-child{box-shadow:inset 3px 0 0 var(--gold)}
         .standings .pos{color:var(--mut2);width:18px;display:inline-block}
         .standings td.ptcol b{color:var(--gold)}
 
@@ -441,7 +442,7 @@
         const table=computeGroupStandings(g);
         let rows='';
         table.forEach((row,i)=>{
-            rows+='<tr class="'+(i<2?'qual':'')+'">'+
+            rows+='<tr class="'+(i<2?'qual':(i===2?'qual3':''))+'">'+
                 '<td class="lt"><span class="pos">'+(i+1)+'</span></td>'+
                 '<td class="lt team"><span class="fl">'+fl(row.team)+'</span>'+row.team+'</td>'+
                 '<td class="hd">'+row.p+'</td><td class="hd">'+row.w+'</td><td class="hd">'+row.d+'</td><td class="hd">'+row.l+'</td>'+
@@ -478,7 +479,7 @@
                 '</div>';
         });
         return '<div class="group">'+
-            '<div class="group-head"><div class="gbadge">'+g+'</div><div class="gt">Grupa '+g+'</div><div class="gc">4 echipe · primele 2 avansează</div></div>'+
+            '<div class="group-head"><div class="gbadge">'+g+'</div><div class="gt">Grupa '+g+'</div></div>'+
             '<div class="standings"><table>'+
             '<thead><tr><th class="lt" colspan="2">Echipă</th><th class="hd">J</th><th class="hd">V</th><th class="hd">E</th><th class="hd">Î</th><th>P</th></tr></thead>'+
             '<tbody>'+rows+'</tbody></table></div>'+
