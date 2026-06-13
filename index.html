@@ -104,6 +104,7 @@
         .standings td.team .fl{font-size:19px}
         .standings tr.qual td:first-child{box-shadow:inset 3px 0 0 var(--green)}
         .standings tr.qual3 td:first-child{box-shadow:inset 3px 0 0 var(--gold)}
+        .standings th:first-child,.standings td:first-child{padding-left:12px}
         .standings .pos{color:var(--mut2);width:18px;display:inline-block}
         .standings td.ptcol b{color:var(--gold)}
 
@@ -181,6 +182,15 @@
         .fdot{width:7px;height:7px;border-radius:50%}
         .fdot.f3{background:var(--green)} .fdot.f1{background:var(--gold)} .fdot.f0{background:#3a3a44}
 
+        .champ-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:14px 0}
+        .champ-pick{display:flex;align-items:center;gap:9px;background:var(--field);border:1px solid var(--line);border-radius:7px;padding:11px 12px;cursor:pointer;color:var(--txt);font-family:'Archivo';font-weight:700;font-size:13.5px;text-align:left;transition:.15s}
+        .champ-pick:hover{border-color:var(--line2)}
+        .champ-pick .cf{font-size:22px;flex-shrink:0;line-height:1}
+        .champ-pick .cn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .champ-pick.sel{border-color:var(--gold);background:rgba(232,179,73,.12);box-shadow:0 0 0 1px var(--gold)}
+        .champ-pick.win{border-color:var(--green);background:rgba(25,195,125,.14)}
+        .champ-pick:disabled{opacity:.55;cursor:not-allowed}
+        .champ-sel{width:100%;background:var(--field);border:1px solid var(--line2);color:var(--txt);padding:12px 14px;border-radius:6px;font-family:'Archivo';font-size:15px;font-weight:600;outline:none}
         .scoring{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:18px 20px;margin-top:16px;font-size:13px;color:var(--mut);line-height:1.9}
         .scoring b{color:var(--gold)}
         .scoring .h{font-family:'Anton';font-size:15px;letter-spacing:.04em;color:var(--txt);text-transform:uppercase;display:block;margin-bottom:6px}
@@ -285,6 +295,9 @@
     const fl = (t)=>TEAMS_FLAGS[t] || "🏳️";
 
     let mode="signup", me=null, isAdmin=false, myPicks={}, results={}, activeTab=1;
+    let myChampion=null, champResult=null;
+    const CHAMPION_DEADLINE = "2026-06-15T00:00:00Z";
+    function championLocked(){return new Date()>=new Date(CHAMPION_DEADLINE);}
     const isFileProto = location.protocol === "file:";
 
     /* ---------- AUTH UI ---------- */
@@ -351,7 +364,7 @@
         $("userAv").textContent=me.name[0].toUpperCase();
         await checkAdmin();
         if(isAdmin) $("userName").innerHTML=me.name+'<span class="adminbadge">Admin</span>';
-        await Promise.all([loadMyPicks(),loadResults()]);
+        await Promise.all([loadMyPicks(),loadResults(),loadChampion()]);
         buildNav();render();
     }
     function showAuth(){me=null;isAdmin=false;$("appScreen").classList.add("hidden");$("authScreen").classList.remove("hidden");}
@@ -375,6 +388,13 @@
         results={};
         const {data}=await sb.from("results").select("*");
         if(data) data.forEach(r=>{results[r.match_id]={home:r.home_score,away:r.away_score};});
+    }
+    async function loadChampion(){
+        myChampion=null; champResult=null;
+        const {data:mine}=await sb.from("champion_picks").select("team").eq("user_id",me.id).maybeSingle();
+        if(mine) myChampion=mine.team;
+        const {data:cfg}=await sb.from("app_config").select("value").eq("key","champion").maybeSingle();
+        if(cfg) champResult=cfg.value;
     }
 
     /* points for a pick vs a real result */
@@ -400,6 +420,11 @@
         lb.className="snav"+(activeTab==="lb"?" on":"");
         lb.innerHTML='<span class="big">🏆 Clasament</span><span class="sm">Top jucători</span>';
         lb.addEventListener("click",()=>{activeTab="lb";buildNav();render();});
+        const ch=document.createElement("button");
+        ch.className="snav"+(activeTab==="champ"?" on":"");
+        ch.innerHTML='<span class="big">👑 Campioană</span><span class="sm">Alege câștigătoarea</span>';
+        ch.addEventListener("click",()=>{activeTab="champ";buildNav();render();});
+        n.appendChild(ch);
         n.appendChild(lb);
         if(isAdmin){
             const ad=document.createElement("button");
@@ -412,6 +437,7 @@
 
     function render(){
         if(activeTab==="lb") return renderLeaderboard();
+        if(activeTab==="champ") return renderChampion();
         if(activeTab==="admin") return renderAdmin();
         renderStage(activeTab);
     }
@@ -481,7 +507,7 @@
         return '<div class="group">'+
             '<div class="group-head"><div class="gbadge">'+g+'</div><div class="gt">Grupa '+g+'</div></div>'+
             '<div class="standings"><table>'+
-            '<thead><tr><th class="lt" colspan="2">Echipă</th><th class="hd">J</th><th class="hd">V</th><th class="hd">E</th><th class="hd">Î</th><th>P</th></tr></thead>'+
+            '<thead><tr><th class="lt">#</th><th class="lt">Echipă</th><th class="hd">J</th><th class="hd">V</th><th class="hd">E</th><th class="hd">Î</th><th>P</th></tr></thead>'+
             '<tbody>'+rows+'</tbody></table></div>'+
             '<div class="matches">'+mhtml+'</div>'+
             '</div>';
@@ -519,10 +545,55 @@
         render();
     }
 
+    /* ---------- CHAMPION: alege câștigătoarea (+10 pct) ---------- */
+    function renderChampion(){
+        const c=$("content");
+        const locked=championLocked();
+        const teams=Object.keys(TEAMS_FLAGS).sort((a,b)=>a.localeCompare(b,"ro"));
+        let banner;
+        if(champResult) banner='<div class="banner"><span class="pulse"></span>Campioana mondială: <b style="color:var(--gold);margin-left:4px">'+fl(champResult)+' '+champResult+'</b>. Cine a ghicit a primit +10 puncte.</div>';
+        else if(locked) banner='<div class="banner closed"><span class="pulse"></span>Alegerea campioanei s-a închis.'+(myChampion?' Alegerea ta: '+fl(myChampion)+' '+myChampion+'.':'')+'</div>';
+        else banner='<div class="banner"><span class="pulse"></span>Alege echipa pe care o crezi campioană. Ghicit corect aduce +10 puncte la final.</div>';
+        let grid='<div class="champ-grid">';
+        teams.forEach(t=>{
+            const sel=myChampion===t?' sel':'';
+            const win=champResult===t?' win':'';
+            grid+='<button class="champ-pick'+sel+win+'" type="button" data-team="'+t+'" '+(locked?'disabled':'')+'><span class="cf">'+fl(t)+'</span><span class="cn">'+t+'</span></button>';
+        });
+        grid+='</div>';
+        const bar=locked?'':'<div class="savebar"><span id="saveStatus">'+(myChampion?'Alegerea ta: '+fl(myChampion)+' '+myChampion:'Nu ai ales încă.')+'</span><button class="btn" id="saveChampBtn" type="button">Salvează alegerea</button></div>';
+        c.innerHTML='<div class="lb-title">Campioana Mondială<span class="sub">+10 puncte dacă ghicești</span></div>'+banner+grid+bar;
+        if(!locked){
+            let chosen=myChampion;
+            c.querySelectorAll(".champ-pick").forEach(b=>b.addEventListener("click",()=>{
+                chosen=b.dataset.team;
+                c.querySelectorAll(".champ-pick").forEach(x=>x.classList.remove("sel"));
+                b.classList.add("sel");
+                $("saveStatus").textContent="Alegerea ta: "+fl(chosen)+" "+chosen+" (nesalvat)";
+            }));
+            $("saveChampBtn").addEventListener("click",()=>saveChampion(chosen));
+        }
+    }
+
+    async function saveChampion(team){
+        if(!team){$("saveStatus").textContent="Alege o echipă întâi.";return;}
+        $("saveChampBtn").disabled=true;$("saveChampBtn").textContent="Se salvează...";
+        const {error}=await sb.from("champion_picks").upsert({user_id:me.id,user_name:me.name,team},{onConflict:"user_id"});
+        $("saveChampBtn").disabled=false;$("saveChampBtn").textContent="Salvează alegerea";
+        if(error){$("saveStatus").textContent="Eroare: "+error.message;return;}
+        myChampion=team;
+        $("saveStatus").textContent="✅ Salvat: "+fl(team)+" "+team;
+    }
+
     /* ---------- ADMIN: enter REAL results ---------- */
     function renderAdmin(){
         const c=$("content");
         let html='<div class="banner info"><span class="pulse"></span>Panou ADMIN — introdu scorurile REALE. Acestea calculează automat clasamentul și clasamentul grupelor. Doar tu vezi acest tab.</div>';
+        const champTeams=Object.keys(TEAMS_FLAGS).sort((a,b)=>a.localeCompare(b,"ro"));
+        html+='<div class="group"><div class="group-head"><div class="gbadge">👑</div><div class="gt">Campioana mondială</div></div><div class="matches"><div style="padding:6px 2px 2px">'+
+            '<select class="champ-sel" id="champSel"><option value="">— alege campioana reală —</option>'+
+            champTeams.map(t=>'<option'+(champResult===t?' selected':'')+'>'+t+'</option>').join('')+'</select>'+
+            '<button class="btn adm" id="saveChampResBtn" type="button" style="width:auto;margin-top:12px;padding:12px 22px;font-size:14px">Salvează campioana</button></div></div></div>';
         STAGES.forEach(s=>{
             const matches=MATCHES.filter(m=>m.md===s.md);
             const byGroup={};matches.forEach(m=>{(byGroup[m.group]=byGroup[m.group]||[]).push(m);});
@@ -549,6 +620,18 @@
         c.innerHTML=html;
         c.querySelectorAll(".match input").forEach(inp=>inp.addEventListener("input",()=>{$("saveStatus").textContent="Ai modificări nesalvate...";}));
         $("saveResBtn").addEventListener("click",saveResults);
+        $("saveChampResBtn").addEventListener("click",saveChampResult);
+    }
+
+    async function saveChampResult(){
+        const team=$("champSel").value;
+        if(!team){$("saveStatus").textContent="Alege o echipă pentru campioană.";return;}
+        $("saveChampResBtn").disabled=true;$("saveChampResBtn").textContent="Se salvează...";
+        const {error}=await sb.from("app_config").upsert({key:"champion",value:team},{onConflict:"key"});
+        $("saveChampResBtn").disabled=false;$("saveChampResBtn").textContent="Salvează campioana";
+        if(error){$("saveStatus").textContent="Eroare: "+error.message;return;}
+        champResult=team;
+        $("saveStatus").textContent="✅ Campioana setată: "+team+" (+10 pct celor care au ghicit)";
     }
 
     async function saveResults(){
@@ -574,6 +657,9 @@
         await loadResults();
         const {data:allPicks,error}=await sb.from("predictions").select("user_id,user_name,match_id,home_score,away_score");
         if(error){c.innerHTML='<div class="center-msg">Eroare: '+error.message+'</div>';return;}
+        const {data:champPicks}=await sb.from("champion_picks").select("user_id,user_name,team");
+        const {data:champCfg}=await sb.from("app_config").select("value").eq("key","champion").maybeSingle();
+        const realChamp=champCfg?champCfg.value:null;
 
         // chronological list of scored matches (by kickoff) for "form"
         const scoredMatchIds = MATCHES.filter(m=>results[m.id]).sort((a,b)=>new Date(a.ko)-new Date(b.ko)).map(m=>m.id);
@@ -591,6 +677,14 @@
             else{S[p.user_id].wrong++;}
         });
 
+        // bonus campioană: +10 celor care au ghicit câștigătoarea
+        if(realChamp) (champPicks||[]).forEach(cp=>{
+            if(cp.team!==realChamp) return;
+            if(!S[cp.user_id]) S[cp.user_id]={name:cp.user_name,pts:0,exact:0,res:0,wrong:0,total:0,scored:0,byMatch:{}};
+            S[cp.user_id].pts+=10;
+            S[cp.user_id].champ=true;
+        });
+
         const arr=Object.entries(S).map(([id,v])=>{
             const acc=v.scored?Math.round(((v.exact+v.res)/v.scored)*100):0;
             // form: last up to 6 scored matches
@@ -606,6 +700,7 @@
             html+=scoringBox();c.innerHTML=html;return;
         }
         const anyResults=scoredMatchIds.length>0;
+        if(!anyResults) html+='<div class="banner info"><span class="pulse"></span>Punctele apar după ce adminul introduce rezultatele reale. Momentan se afișează doar cine a pariat.</div>';
 
         // PODIUM (top 3) — only meaningful with results, but show anyway
         if(arr.length>=3){
@@ -629,7 +724,7 @@
             if(anyResults){formHtml='<div class="lb-form">'+u.form.map(f=>f<0?'<span class="fdot f0"></span>':'<span class="fdot f'+f+'"></span>').join('')+'</div>';}
             html+='<div class="lb-row'+(u.id===me.id?' me':'')+'">'+
                 '<div class="rk '+cls+'">'+medal+'</div>'+
-                '<div class="lb-name"><span class="av">'+u.name[0].toUpperCase()+'</span><span class="nm">'+u.name+'</span>'+(u.id===me.id?' <span class="tagme">TU</span>':'')+formHtml+'</div>'+
+                '<div class="lb-name"><span class="av">'+u.name[0].toUpperCase()+'</span><span class="nm">'+u.name+(u.champ?' 👑':'')+'</span>'+(u.id===me.id?' <span class="tagme">TU</span>':'')+formHtml+'</div>'+
                 '<div class="lb-cell">'+u.exact+'</div>'+
                 '<div class="lb-cell">'+u.res+'</div>'+
                 '<div class="lb-pts">'+u.pts+'</div>'+
@@ -643,6 +738,7 @@
         return '<div class="scoring"><span class="h">Sistem de punctare</span>'+
             '🎯 Scor exact ghicit = <b>3 puncte</b><br>'+
             '✅ Doar rezultatul corect (1 / X / 2) = <b>1 punct</b><br>'+
+            '👑 Campioana mondială ghicită = <b>+10 puncte</b><br>'+
             '❌ Greșit = 0 puncte<br><br>'+
             '<span style="font-size:12px;color:var(--mut2)">Coloanele: <b style="color:var(--mut)">Exact</b> = scoruri exacte ghicite · <b style="color:var(--mut)">1X2</b> = rezultate corecte (1/X/2). Bulinele = forma la ultimele meciuri (🟢 exact · 🟡 rezultat · ⚫ greșit).</span></div>';
     }
