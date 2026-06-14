@@ -2,7 +2,7 @@ name: Sync WC results
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "*/30 0-6,17-23 * * *"
   workflow_dispatch:
 
 jobs:
