@@ -163,10 +163,10 @@
         .pod.p1{padding-top:24px;padding-bottom:24px}
 
         .lb{background:linear-gradient(180deg,var(--panel),var(--ink2));border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-top:12px}
-        .lb-head{display:grid;grid-template-columns:44px 1fr 60px 60px 64px;gap:8px;padding:12px 18px;background:var(--ink2);border-bottom:1px solid var(--line);font-family:'Archivo Narrow';font-size:10px;letter-spacing:.08em;color:var(--mut2);text-transform:uppercase;font-weight:700;align-items:center}
+        .lb-head{display:grid;grid-template-columns:44px 40px 1fr 60px 60px 64px;gap:8px;padding:12px 18px;background:var(--ink2);border-bottom:1px solid var(--line);font-family:'Archivo Narrow';font-size:10px;letter-spacing:.08em;color:var(--mut2);text-transform:uppercase;font-weight:700;align-items:center}
         .lb-head .lt{text-align:left}
         .lb-head span{text-align:center}
-        .lb-row{display:grid;grid-template-columns:44px 1fr 60px 60px 64px;gap:8px;padding:14px 18px;border-bottom:1px solid var(--line);align-items:center}
+        .lb-row{display:grid;grid-template-columns:44px 40px 1fr 60px 60px 64px;gap:8px;padding:14px 18px;border-bottom:1px solid var(--line);align-items:center}
         .lb-row:last-child{border-bottom:none}
         .lb-row.me{background:rgba(232,179,73,.07)}
         .rk{font-family:'Anton';font-size:22px;text-align:center}
@@ -181,6 +181,8 @@
         .lb-form{display:flex;gap:3px;justify-content:center;margin-top:5px}
         .fdot{width:7px;height:7px;border-radius:50%}
         .fdot.f3{background:var(--green)} .fdot.f1{background:var(--gold)} .fdot.f0{background:#3a3a44}
+        .lb-move{font-family:'Archivo Narrow';font-weight:800;font-size:12px;text-align:center;letter-spacing:-.02em;white-space:nowrap}
+        .lb-move.up{color:var(--green)} .lb-move.down{color:var(--red2)} .lb-move.same{color:var(--mut2)} .lb-move.new{color:var(--gold)}
 
         .champ-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:14px 0}
         .champ-pick{display:flex;align-items:center;gap:9px;background:var(--field);border:1px solid var(--line);border-radius:7px;padding:11px 12px;cursor:pointer;color:var(--txt);font-family:'Archivo';font-weight:700;font-size:13.5px;text-align:left;transition:.15s}
@@ -203,7 +205,7 @@
         .hidden{display:none!important}
 
         @media(max-width:620px){
-            .lb-head,.lb-row{grid-template-columns:30px 1fr 40px 40px 46px;gap:5px;padding-left:9px;padding-right:9px}
+            .lb-head,.lb-row{grid-template-columns:30px 30px 1fr 40px 40px 46px;gap:5px;padding-left:9px;padding-right:9px}
             .lb-head{font-size:9px}
             .lb-name{gap:8px}
             .lb-name .av{width:26px;height:26px;font-size:13px}
@@ -694,6 +696,23 @@
             return {id,...v,acc,form};
         }).sort((a,b)=>b.pts-a.pts||b.exact-a.exact||b.acc-a.acc);
 
+        // mișcare față de ultima actualizare a clasamentului (per dispozitiv, via localStorage)
+        const curRanks={}; arr.forEach((u,i)=>{curRanks[u.id]=i+1;});
+        const curSig=(realChamp||"")+"#"+scoredMatchIds.map(id=>id+":"+results[id].home+"-"+results[id].away).join("|");
+        let moveBy={};
+        try{
+            const snap=JSON.parse(localStorage.getItem("wc2026_lb_snap")||"null");
+            if(!snap){
+                arr.forEach(u=>moveBy[u.id]=0);
+                localStorage.setItem("wc2026_lb_snap",JSON.stringify({sig:curSig,ranks:curRanks,moveBy}));
+            }else if(snap.sig!==curSig){
+                arr.forEach(u=>{const prev=snap.ranks[u.id];moveBy[u.id]=(prev==null)?null:prev-curRanks[u.id];});
+                localStorage.setItem("wc2026_lb_snap",JSON.stringify({sig:curSig,ranks:curRanks,moveBy}));
+            }else{
+                moveBy=snap.moveBy||{};
+            }
+        }catch(e){moveBy={};}
+
         let html='<div class="lb-title">Clasament General<span class="sub">PREDICTOR LEAGUE · CM 2026</span></div>';
         if(arr.length===0){
             html+='<div class="center-msg"><span class="ic">⚽</span>Încă nimeni n-a pus pronosticuri.<br>Fii primul care intră în istorie!</div>';
@@ -717,14 +736,20 @@
         }
 
         html+='<div class="lb">'+
-            '<div class="lb-head"><span>#</span><span class="lt">Jucător</span><span>Exact</span><span>1X2</span><span>Pct</span></div>';
+            '<div class="lb-head"><span>#</span><span>↕</span><span class="lt">Jucător</span><span>Exact</span><span>1X2</span><span>Pct</span></div>';
         arr.forEach((u,i)=>{
             const r=i+1;const cls=r===1?'g':r===2?'s':r===3?'b':'';const medal=r===1?'🥇':r===2?'🥈':r===3?'🥉':r;
             let formHtml='';
             if(anyResults){formHtml='<div class="lb-form">'+u.form.map(f=>f<0?'<span class="fdot f0"></span>':'<span class="fdot f'+f+'"></span>').join('')+'</div>';}
+            const dv=moveBy[u.id];
+            let moveHtml;
+            if(dv==null) moveHtml='<div class="lb-move new" title="nou în clasament">●</div>';
+            else if(dv>0) moveHtml='<div class="lb-move up">▲'+dv+'</div>';
+            else if(dv<0) moveHtml='<div class="lb-move down">▼'+(-dv)+'</div>';
+            else moveHtml='<div class="lb-move same">–</div>';
             html+='<div class="lb-row'+(u.id===me.id?' me':'')+'">'+
-                '<div class="rk '+cls+'">'+medal+'</div>'+
-                '<div class="lb-name"><span class="av">'+u.name[0].toUpperCase()+'</span><span class="nm">'+u.name+(u.champ?' 👑':'')+'</span>'+(u.id===me.id?' <span class="tagme">TU</span>':'')+formHtml+'</div>'+
+                '<div class="rk '+cls+'">'+medal+'</div>'+moveHtml+
+                '<div class="lb-name"><span class="nm">'+u.name+(u.champ?' 👑':'')+'</span>'+(u.id===me.id?' <span class="tagme">TU</span>':'')+formHtml+'</div>'+
                 '<div class="lb-cell">'+u.exact+'</div>'+
                 '<div class="lb-cell">'+u.res+'</div>'+
                 '<div class="lb-pts">'+u.pts+'</div>'+
