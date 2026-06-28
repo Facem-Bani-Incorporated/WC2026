@@ -193,6 +193,17 @@
         .champ-pick.win{border-color:var(--green);background:rgba(25,195,125,.14)}
         .champ-pick:disabled{opacity:.55;cursor:not-allowed}
         .champ-sel{width:100%;background:var(--field);border:1px solid var(--line2);color:var(--txt);padding:12px 14px;border-radius:6px;font-family:'Archivo';font-size:15px;font-weight:600;outline:none}
+        .koround{margin:24px 0 2px;display:flex;align-items:center;gap:10px}
+        .koround .rt{font-family:'Anton';font-size:21px;letter-spacing:.04em;text-transform:uppercase}
+        .koround .rl{margin-left:auto;font-family:'Archivo Narrow';font-size:11px;letter-spacing:.14em;color:var(--mut2);text-transform:uppercase;font-weight:700}
+        .koslot .nm{color:var(--mut2);font-style:italic;font-weight:600}
+        .advrow{margin-top:11px;display:none;flex-wrap:wrap;align-items:center;gap:8px;border-top:1px dashed var(--line2);padding-top:11px}
+        .advrow.show{display:flex}
+        .advrow .lbl{width:100%;font-family:'Archivo Narrow';font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:1px}
+        .advbtn{display:flex;align-items:center;gap:7px;background:var(--ink);border:1.5px solid var(--line2);color:var(--txt);padding:8px 13px;border-radius:6px;cursor:pointer;font-family:'Archivo';font-weight:700;font-size:13px;transition:.15s}
+        .advbtn .cf{font-size:18px;line-height:1}
+        .advbtn.sel{border-color:var(--gold);background:rgba(232,179,73,.14);box-shadow:0 0 0 1px var(--gold)}
+        .advbtn:disabled{opacity:.5;cursor:not-allowed}
         .scoring{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:18px 20px;margin-top:16px;font-size:13px;color:var(--mut);line-height:1.9}
         .scoring b{color:var(--gold)}
         .scoring .h{font-family:'Anton';font-size:15px;letter-spacing:.04em;color:var(--txt);text-transform:uppercase;display:block;margin-bottom:6px}
@@ -284,12 +295,16 @@
     const SUPABASE_URL  = "https://opcaanudedwsophcdypl.supabase.co";
     const SUPABASE_ANON = "sb_publishable_xu1475LvWcqCPkyLZ3O-iQ_0Ab7TqvP";
 
-    let TEAMS_FLAGS, GROUPS, MATCHES, STAGES;
+    let TEAMS_FLAGS, GROUPS, MATCHES, STAGES, KO_ROUNDS;
     const D = await (await fetch("./data.json")).json();
     TEAMS_FLAGS = D.teamsFlags;
     GROUPS      = D.groups;
     MATCHES     = D.matches;
     STAGES      = D.stages;
+    KO_ROUNDS   = D.koRounds || [];
+
+    const MATCH_BY_ID = {}; MATCHES.forEach(m=>{MATCH_BY_ID[m.id]=m;});
+    const isKO = (m)=> (typeof m==="string"?MATCH_BY_ID[m]:m)?.phase==="ko";
 
 
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
@@ -384,12 +399,12 @@
     async function loadMyPicks(){
         myPicks={};
         const {data}=await sb.from("predictions").select("*").eq("user_id",me.id);
-        if(data) data.forEach(p=>{myPicks[p.match_id]={home:p.home_score,away:p.away_score};});
+        if(data) data.forEach(p=>{myPicks[p.match_id]={home:p.home_score,away:p.away_score,adv:p.adv||null};});
     }
     async function loadResults(){
         results={};
         const {data}=await sb.from("results").select("*");
-        if(data) data.forEach(r=>{results[r.match_id]={home:r.home_score,away:r.away_score};});
+        if(data) data.forEach(r=>{results[r.match_id]={home:r.home_score,away:r.away_score,adv:r.adv||null};});
     }
     async function loadChampion(){
         myChampion=null; champResult=null;
@@ -399,12 +414,64 @@
         if(cfg) champResult=cfg.value;
     }
 
-    /* points for a pick vs a real result */
+    /* points for a pick vs a real result (90-min score: 3 exact / 1 outcome / 0) */
     function ptsFor(pick, real){
         if(!pick||!real) return null;
         if(pick.home===real.home&&pick.away===real.away) return 3;
         const sg=(h,a)=>h>a?1:h<a?-1:0;
         return sg(pick.home,pick.away)===sg(real.home,real.away)?1:0;
+    }
+
+    /* ---------- KNOCKOUT: resolve teams from slot refs + winners ---------- */
+    // resolve the real teams of a KO match: explicit home/away (R32) or via slot refs
+    function koTeams(m){
+        if(!m) return {home:null,away:null};
+        return { home: m.home || refTeam(m.homeRef), away: m.away || refTeam(m.awayRef) };
+    }
+    function refTeam(ref){
+        if(!ref) return null;
+        if(ref.w) return winnerOf(ref.w);
+        if(ref.l) return loserOf(ref.l);
+        return null;
+    }
+    // human label for an unresolved slot, e.g. "Câștigătoare M74"
+    function refLabel(ref){
+        if(!ref) return "—";
+        const src=MATCH_BY_ID[ref.w||ref.l];
+        const n=src?src.mNum:"?";
+        return (ref.w?"Câștigătoare M":"Învinsă M")+n;
+    }
+    function winnerOf(id){
+        const r=results[id]; if(!r) return null;
+        const t=koTeams(MATCH_BY_ID[id]); if(!t.home||!t.away) return null;
+        if(r.home>r.away) return t.home;
+        if(r.away>r.home) return t.away;
+        return r.adv||null;                 // 90-min draw -> advancing team
+    }
+    function loserOf(id){
+        const r=results[id]; if(!r) return null;
+        const t=koTeams(MATCH_BY_ID[id]); if(!t.home||!t.away) return null;
+        if(r.home>r.away) return t.away;
+        if(r.away>r.home) return t.home;
+        if(!r.adv) return null;
+        return r.adv===t.home ? t.away : t.home;
+    }
+
+    /* total points for a KO pick: 90-min base (3/1/0) + 1 if you predicted a
+       draw AND picked the correct team to advance after extra time/penalties */
+    function koBonus(pick, real){
+        if(!pick||!real) return 0;
+        if(pick.home!==pick.away) return 0;          // bonus only on a draw prediction
+        if(!pick.adv) return 0;                      // you didn't pick who advances
+        if(real.home!==real.away) return 0;          // real match decided in 90' (no ET)
+        if(!real.adv) return 0;
+        return pick.adv===real.adv ? 1 : 0;
+    }
+    // unified scorer used by leaderboard + displays
+    function ptsForMatch(pick, real, matchId){
+        const base=ptsFor(pick, real);
+        if(base==null) return null;
+        return isKO(matchId) ? base + koBonus(pick, real) : base;
     }
 
     /* ---------- NAV ---------- */
@@ -418,6 +485,11 @@
             if(un) b.addEventListener("click",()=>{activeTab=s.md;buildNav();render();});
             n.appendChild(b);
         });
+        const ko=document.createElement("button");
+        ko.className="snav"+(activeTab==="ko"?" on":"");
+        ko.innerHTML='<span class="big">🏟️ Play-off</span><span class="sm">Faza eliminatorie</span>';
+        ko.addEventListener("click",()=>{activeTab="ko";buildNav();render();});
+        n.appendChild(ko);
         const lb=document.createElement("button");
         lb.className="snav"+(activeTab==="lb"?" on":"");
         lb.innerHTML='<span class="big">🏆 Clasament</span><span class="sm">Top jucători</span>';
@@ -440,6 +512,7 @@
     function render(){
         if(activeTab==="lb") return renderLeaderboard();
         if(activeTab==="champ") return renderChampion();
+        if(activeTab==="ko") return renderKO();
         if(activeTab==="admin") return renderAdmin();
         renderStage(activeTab);
     }
@@ -547,6 +620,126 @@
         render();
     }
 
+    /* ---------- PLAYER: KNOCKOUT (play-off predictions) ---------- */
+    function renderKO(){
+        const c=$("content");
+        const koMatches=MATCHES.filter(m=>m.phase==="ko");
+        const allLocked=koMatches.every(matchLocked);
+        let html='<div class="lb-title">Faza Eliminatorie<span class="sub">PLAY-OFF · CM 2026</span></div>';
+        html+='<div class="banner'+(allLocked?' closed':' info')+'"><span class="pulse"></span>'+
+            (allLocked?'Toate meciurile din play-off s-au închis.'
+                :'Pune scorul din <b style="color:var(--txt)">90 de minute</b>. Dacă pronostichezi egal, alege și echipa care merge mai departe pentru un punct în plus.')+'</div>';
+
+        KO_ROUNDS.forEach(rnd=>{
+            const ms=koMatches.filter(m=>m.round===rnd.round);
+            if(!ms.length) return;
+            html+='<div class="koround"><span class="rt">'+rnd.label+'</span><span class="rl">'+ms.length+' meci'+(ms.length>1?'uri':'')+'</span></div>';
+            html+='<div class="group"><div class="matches">';
+            ms.forEach(m=>{html+=renderKOMatch(m);});
+            html+='</div></div>';
+        });
+        html+='<div class="savebar"><span id="saveStatus">Apasă ‘Salvează’ ca să trimiți pronosticurile de play-off.</span><button class="btn" id="saveKOBtn" type="button">Salvează tot</button></div>';
+        html+=scoringBox();
+        c.innerHTML=html;
+
+        // wire up: toggle the "who advances" selector when the predicted score is a draw
+        c.querySelectorAll(".match").forEach(card=>{
+            const hi=card.querySelector('input[data-s=home]'),ai=card.querySelector('input[data-s=away]');
+            if(!hi||hi.disabled) return;
+            const syncAdv=()=>{
+                const draw=hi.value!==""&&ai.value!==""&&parseInt(hi.value)===parseInt(ai.value);
+                const row=card.querySelector(".advrow");
+                if(row) row.classList.toggle("show",draw);
+                $("saveStatus").textContent="Ai modificări nesalvate...";
+            };
+            hi.addEventListener("input",syncAdv);
+            ai.addEventListener("input",syncAdv);
+            card.querySelectorAll(".advbtn").forEach(b=>b.addEventListener("click",()=>{
+                if(b.disabled) return;
+                card.querySelectorAll(".advbtn").forEach(x=>x.classList.remove("sel"));
+                b.classList.add("sel");
+                $("saveStatus").textContent="Ai modificări nesalvate...";
+            }));
+        });
+        $("saveKOBtn").addEventListener("click",saveKOPicks);
+    }
+
+    function renderKOMatch(m){
+        const t=koTeams(m);
+        const resolved=!!(t.home&&t.away);
+        const homeName=t.home||refLabel(m.homeRef), awayName=t.away||refLabel(m.awayRef);
+        const locked=matchLocked(m);
+        const disabled=locked||!resolved;
+        const p=myPicks[m.id]||{};
+        const has=p.home!=null&&p.away!=null;
+        const real=results[m.id];
+        const earned=has&&real?ptsForMatch(p,real,m.id):null;
+        const d=new Date(m.ko);
+        const dstr="M"+m.mNum+" · "+d.toLocaleDateString("ro-RO",{weekday:"short",day:"numeric",month:"short"})+" · "+d.toLocaleTimeString("ro-RO",{hour:"2-digit",minute:"2-digit"});
+        let headRight='';
+        if(real){
+            let fin='FINAL '+real.home+'–'+real.away;
+            if(real.home===real.away&&real.adv) fin+=' ('+real.adv+' calificată)';
+            headRight='<span class="finalscore">'+fin+'</span>';
+        } else if(locked) headRight='<span class="lockicon">🔒 BLOCAT</span>';
+        else if(!resolved) headRight='<span class="lockicon" style="color:var(--mut2)">se stabilește</span>';
+
+        let predLine='';
+        if(has){
+            let badge='';
+            if(earned!=null){
+                const cls=earned>=3?'p3':earned>=1?'p1':'p0';
+                badge='<span class="ptearned '+cls+'">+'+earned+' PCT</span>';
+            }
+            predLine='Pronosticul tău: '+p.home+'–'+p.away+(p.adv?' · '+p.adv+' ✔':'')+badge;
+        }
+
+        // "who advances" selector — only relevant on a draw; pre-shown if the saved pick is a draw
+        const drawPick=has&&p.home===p.away;
+        let advRow='';
+        if(resolved){
+            const mk=(team)=>'<button class="advbtn'+(p.adv===team?' sel':'')+'" type="button" data-adv="'+team+'" '+(disabled?'disabled':'')+'><span class="cf">'+fl(team)+'</span>'+team+'</button>';
+            advRow='<div class="advrow'+(drawPick?' show':'')+'">'+
+                '<span class="lbl">La egalitate — cine merge mai departe? (+1 pct)</span>'+
+                mk(t.home)+mk(t.away)+'</div>';
+        }
+
+        const hside=(team,isAway)=>'<div class="tm-side'+(isAway?' away':'')+(resolved?'':' koslot')+'">'+
+            '<span class="fl">'+(resolved?fl(team):'🏳️')+'</span><span class="nm">'+team+'</span>'+
+            '<input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="'+(isAway?'away':'home')+'" value="'+((isAway?p.away:p.home)??"")+'" '+(disabled?'disabled':'')+'/></div>';
+
+        return '<div class="match'+(locked?' locked':'')+(has?' haspick':'')+(real?' scored':'')+'" data-id="'+m.id+'" data-home="'+(t.home||'')+'" data-away="'+(t.away||'')+'">'+
+            '<div class="mhead"><span class="dt">'+dstr+'</span>'+headRight+'</div>'+
+            '<div class="mrow">'+hside(homeName,false)+hside(awayName,true)+'</div>'+
+            advRow+
+            '<div class="predicted">'+predLine+'</div>'+
+            '</div>';
+    }
+
+    async function saveKOPicks(){
+        const rows=[];
+        document.querySelectorAll("#content .match").forEach(card=>{
+            const hi=card.querySelector('input[data-s=home]'),ai=card.querySelector('input[data-s=away]');
+            if(!hi||hi.disabled) return;
+            if(hi.value===""||ai.value==="") return;
+            const h=parseInt(hi.value),a=parseInt(ai.value);
+            let adv=null;
+            if(h===a){
+                const sel=card.querySelector(".advbtn.sel");
+                if(sel) adv=sel.dataset.adv;
+            }
+            rows.push({user_id:me.id,user_name:me.name,match_id:card.dataset.id,home_score:h,away_score:a,adv});
+        });
+        if(rows.length===0){$("saveStatus").textContent="Nimic de salvat.";return;}
+        $("saveKOBtn").disabled=true;$("saveKOBtn").textContent="Se salvează...";
+        const {error}=await sb.from("predictions").upsert(rows,{onConflict:"user_id,match_id"});
+        $("saveKOBtn").disabled=false;$("saveKOBtn").textContent="Salvează tot";
+        if(error){$("saveStatus").textContent="Eroare: "+error.message;return;}
+        rows.forEach(r=>{myPicks[r.match_id]={home:r.home_score,away:r.away_score,adv:r.adv||null};});
+        $("saveStatus").textContent="✅ Salvat! ("+rows.length+" pronosticuri)";
+        render();
+    }
+
     /* ---------- CHAMPION: alege câștigătoarea (+10 pct) ---------- */
     function renderChampion(){
         const c=$("content");
@@ -618,9 +811,52 @@
             });
             html+='</div></div>';
         });
+        // KNOCKOUT results — score in 90' + (on a draw) who advanced after ET/penalties
+        KO_ROUNDS.forEach(rnd=>{
+            const ms=MATCHES.filter(m=>m.phase==="ko"&&m.round===rnd.round);
+            if(!ms.length) return;
+            html+='<div class="group"><div class="group-head"><div class="gbadge">🏟️</div><div class="gt">'+rnd.label+'</div><div class="gc">rezultate reale · scor 90′</div></div><div class="matches">';
+            ms.forEach(m=>{
+                const t=koTeams(m);
+                const resolved=!!(t.home&&t.away);
+                const homeName=t.home||refLabel(m.homeRef), awayName=t.away||refLabel(m.awayRef);
+                const real=results[m.id]||{};
+                const has=real.home!=null;
+                const isDraw=has&&real.home===real.away;
+                const d=new Date(m.ko);
+                const dstr="M"+m.mNum+" · "+d.toLocaleDateString("ro-RO",{day:"numeric",month:"short"});
+                let headRight='';
+                if(has){let fin='SALVAT '+real.home+'–'+real.away;if(isDraw&&real.adv)fin+=' ('+real.adv+')';headRight='<span class="finalscore">'+fin+'</span>';}
+                else if(!resolved) headRight='<span class="lockicon" style="color:var(--mut2)">se stabilește</span>';
+                const dis=resolved?'':'disabled';
+                let advRow='';
+                if(resolved){
+                    const mk=(team)=>'<button class="advbtn'+(real.adv===team?' sel':'')+'" type="button" data-adv="'+team+'"><span class="cf">'+fl(team)+'</span>'+team+'</button>';
+                    advRow='<div class="advrow'+(isDraw?' show':'')+'"><span class="lbl">La egalitate — cine s-a calificat? (prelungiri/penalty)</span>'+mk(t.home)+mk(t.away)+'</div>';
+                }
+                html+='<div class="match'+(has?' scored':'')+'" data-id="'+m.id+'">'+
+                    '<div class="mhead"><span class="dt">'+dstr+'</span>'+headRight+'</div>'+
+                    '<div class="mrow">'+
+                    '<div class="tm-side adm'+(resolved?'':' koslot')+'"><span class="fl">'+(resolved?fl(t.home):'🏳️')+'</span><span class="nm">'+homeName+'</span><input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="home" value="'+(real.home??"")+'" '+dis+'/></div>'+
+                    '<div class="tm-side away adm'+(resolved?'':' koslot')+'"><span class="fl">'+(resolved?fl(t.away):'🏳️')+'</span><span class="nm">'+awayName+'</span><input class="sc" type="number" min="0" max="99" inputmode="numeric" data-s="away" value="'+(real.away??"")+'" '+dis+'/></div>'+
+                    '</div>'+advRow+'</div>';
+            });
+            html+='</div></div>';
+        });
         html+='<div class="savebar"><span id="saveStatus">Completează doar meciurile jucate. Restul lasă-le goale.</span><button class="btn adm" id="saveResBtn" type="button">Salvează rezultatele</button></div>';
         c.innerHTML=html;
         c.querySelectorAll(".match input").forEach(inp=>inp.addEventListener("input",()=>{$("saveStatus").textContent="Ai modificări nesalvate...";}));
+        // KO: toggle the "who advanced" row on a draw, and wire the advance buttons
+        c.querySelectorAll(".match").forEach(card=>{
+            const hi=card.querySelector('input[data-s=home]'),ai=card.querySelector('input[data-s=away]');
+            const row=card.querySelector(".advrow"); if(!row||!hi||hi.disabled) return;
+            const sync=()=>{const draw=hi.value!==""&&ai.value!==""&&parseInt(hi.value)===parseInt(ai.value);row.classList.toggle("show",draw);};
+            hi.addEventListener("input",sync);ai.addEventListener("input",sync);
+            card.querySelectorAll(".advbtn").forEach(b=>b.addEventListener("click",()=>{
+                card.querySelectorAll(".advbtn").forEach(x=>x.classList.remove("sel"));
+                b.classList.add("sel");$("saveStatus").textContent="Ai modificări nesalvate...";
+            }));
+        });
         $("saveResBtn").addEventListener("click",saveResults);
         $("saveChampResBtn").addEventListener("click",saveChampResult);
     }
@@ -640,7 +876,13 @@
         const rows=[];
         document.querySelectorAll(".match").forEach(card=>{
             const hi=card.querySelector('input[data-s=home]'),ai=card.querySelector('input[data-s=away]');
-            if(hi.value!==""&&ai.value!=="") rows.push({match_id:card.dataset.id,home_score:parseInt(hi.value),away_score:parseInt(ai.value),updated_by:me.id});
+            if(!hi||ai==null) return;
+            if(hi.value!==""&&ai.value!==""){
+                const h=parseInt(hi.value),a=parseInt(ai.value);
+                let adv=null;
+                if(h===a){const sel=card.querySelector(".advbtn.sel");if(sel)adv=sel.dataset.adv;}
+                rows.push({match_id:card.dataset.id,home_score:h,away_score:a,adv,updated_by:me.id});
+            }
         });
         if(rows.length===0){$("saveStatus").textContent="Nimic de salvat.";return;}
         $("saveResBtn").disabled=true;$("saveResBtn").textContent="Se salvează...";
@@ -657,7 +899,7 @@
         const c=$("content");
         c.innerHTML='<div class="loader"><div class="spinner"></div>Calculez clasamentul...</div>';
         await loadResults();
-        const {data:allPicks,error}=await sb.from("predictions").select("user_id,user_name,match_id,home_score,away_score");
+        const {data:allPicks,error}=await sb.from("predictions").select("user_id,user_name,match_id,home_score,away_score,adv");
         if(error){c.innerHTML='<div class="center-msg">Eroare: '+error.message+'</div>';return;}
         const {data:champPicks}=await sb.from("champion_picks").select("user_id,user_name,team");
         const {data:champCfg}=await sb.from("app_config").select("value").eq("key","champion").maybeSingle();
@@ -670,13 +912,17 @@
         (allPicks||[]).forEach(p=>{
             if(!S[p.user_id]) S[p.user_id]={name:p.user_name,pts:0,exact:0,res:0,wrong:0,total:0,scored:0,byMatch:{}};
             S[p.user_id].total++;
-            S[p.user_id].byMatch[p.match_id]={home:p.home_score,away:p.away_score};
+            const pick={home:p.home_score,away:p.away_score,adv:p.adv||null};
+            S[p.user_id].byMatch[p.match_id]=pick;
             const real=results[p.match_id];if(!real)return;
             S[p.user_id].scored++;
-            const e=ptsFor({home:p.home_score,away:p.away_score},real);
-            if(e===3){S[p.user_id].pts+=3;S[p.user_id].exact++;}
-            else if(e===1){S[p.user_id].pts+=1;S[p.user_id].res++;}
-            else{S[p.user_id].wrong++;}
+            const base=ptsFor(pick,real);
+            const bonus=isKO(p.match_id)?koBonus(pick,real):0;
+            S[p.user_id].pts+=base+bonus;
+            if(base===3) S[p.user_id].exact++;
+            else if(base===1) S[p.user_id].res++;
+            else S[p.user_id].wrong++;
+            if(bonus) S[p.user_id].advb=(S[p.user_id].advb||0)+bonus;
         });
 
         // bonus campioană: +10 celor care au ghicit câștigătoarea
@@ -761,10 +1007,14 @@
     }
     function scoringBox(){
         return '<div class="scoring"><span class="h">Sistem de punctare</span>'+
-            '🎯 Scor exact ghicit = <b>3 puncte</b><br>'+
-            '✅ Doar rezultatul corect (1 / X / 2) = <b>1 punct</b><br>'+
+            '🎯 Scor exact ghicit (în 90′) = <b>3 puncte</b><br>'+
+            '✅ Doar rezultatul corect (1 / X / 2, în 90′) = <b>1 punct</b><br>'+
             '👑 Campioana mondială ghicită = <b>+10 puncte</b><br>'+
             '❌ Greșit = 0 puncte<br><br>'+
+            '<span class="h" style="font-size:13px">Play-off (faza eliminatorie)</span>'+
+            '🏟️ Scorul contează doar pentru <b>primele 90 de minute</b> (3 pct scor exact · 1 pct rezultat).<br>'+
+            '⚖️ Dacă pronostichezi <b>egal</b>, alegi și echipa calificată din prelungiri/penalty.<br>'+
+            '➕ Echipă calificată ghicită corect = <b>+1 punct</b> (ex: rezultat corect 1 + calificare 1 = 2 pct).<br><br>'+
             '<span style="font-size:12px;color:var(--mut2)">Coloanele: <b style="color:var(--mut)">Exact</b> = scoruri exacte ghicite · <b style="color:var(--mut)">1X2</b> = rezultate corecte (1/X/2). Bulinele = forma la ultimele meciuri (🟢 exact · 🟡 rezultat · ⚫ greșit).</span></div>';
     }
 

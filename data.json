@@ -32,6 +32,14 @@
     { "md": 2, "label": "Etapa 2 (Grupe)", "opensAt": "2026-06-18T16:00:00Z" },
     { "md": 3, "label": "Etapa 3 (Grupe)", "opensAt": "2026-06-24T19:00:00Z" }
   ],
+  "koRounds": [
+    { "round": "R32", "label": "Optimi de 32", "short": "Optimi 32" },
+    { "round": "R16", "label": "Optimi de 16", "short": "Optimi 16" },
+    { "round": "QF",  "label": "Sferturi de finală", "short": "Sferturi" },
+    { "round": "SF",  "label": "Semifinale", "short": "Semifinale" },
+    { "round": "3P",  "label": "Finala mică (locul 3)", "short": "Locul 3" },
+    { "round": "F",   "label": "Finala", "short": "Finala" }
+  ],
   "matches": [
     { "id": "m01", "md": 1, "group": "A", "home": "Mexic", "away": "Africa de Sud", "ko": "2026-06-11T19:00:00Z" },
     { "id": "m02", "md": 1, "group": "A", "home": "Coreea de Sud", "away": "Cehia", "ko": "2026-06-12T02:00:00Z" },
@@ -104,6 +112,44 @@
     { "id": "m69", "md": 3, "group": "K", "home": "Columbia", "away": "Portugalia", "ko": "2026-06-27T23:30:00Z" },
     { "id": "m70", "md": 3, "group": "K", "home": "RD Congo", "away": "Uzbekistan", "ko": "2026-06-27T23:30:00Z" },
     { "id": "m71", "md": 3, "group": "J", "home": "Iordania", "away": "Argentina", "ko": "2026-06-28T02:00:00Z" },
-    { "id": "m72", "md": 3, "group": "J", "home": "Algeria", "away": "Austria", "ko": "2026-06-28T02:00:00Z" }
+    { "id": "m72", "md": 3, "group": "J", "home": "Algeria", "away": "Austria", "ko": "2026-06-28T02:00:00Z" },
+
+    { "id": "m73", "phase": "ko", "round": "R32", "mNum": 73, "home": "Africa de Sud", "away": "Canada", "ko": "2026-06-28T19:00:00Z" },
+    { "id": "m74", "phase": "ko", "round": "R32", "mNum": 74, "home": "Germania", "away": "Paraguay", "ko": "2026-06-29T20:30:00Z" },
+    { "id": "m75", "phase": "ko", "round": "R32", "mNum": 75, "home": "Olanda", "away": "Maroc", "ko": "2026-06-30T01:00:00Z" },
+    { "id": "m76", "phase": "ko", "round": "R32", "mNum": 76, "home": "Brazilia", "away": "Japonia", "ko": "2026-06-29T17:00:00Z" },
+    { "id": "m77", "phase": "ko", "round": "R32", "mNum": 77, "home": "Franța", "away": "Suedia", "ko": "2026-06-30T21:00:00Z" },
+    { "id": "m78", "phase": "ko", "round": "R32", "mNum": 78, "home": "Coasta de Fildeș", "away": "Norvegia", "ko": "2026-06-30T17:00:00Z" },
+    { "id": "m79", "phase": "ko", "round": "R32", "mNum": 79, "home": "Mexic", "away": "Ecuador", "ko": "2026-07-01T01:00:00Z" },
+    { "id": "m80", "phase": "ko", "round": "R32", "mNum": 80, "home": "Anglia", "away": "RD Congo", "ko": "2026-07-01T16:00:00Z" },
+    { "id": "m81", "phase": "ko", "round": "R32", "mNum": 81, "home": "SUA", "away": "Bosnia și Herțegovina", "ko": "2026-07-02T00:00:00Z" },
+    { "id": "m82", "phase": "ko", "round": "R32", "mNum": 82, "home": "Belgia", "away": "Senegal", "ko": "2026-07-01T20:00:00Z" },
+    { "id": "m83", "phase": "ko", "round": "R32", "mNum": 83, "home": "Portugalia", "away": "Croația", "ko": "2026-07-02T23:00:00Z" },
+    { "id": "m84", "phase": "ko", "round": "R32", "mNum": 84, "home": "Spania", "away": "Austria", "ko": "2026-07-02T19:00:00Z" },
+    { "id": "m85", "phase": "ko", "round": "R32", "mNum": 85, "home": "Elveția", "away": "Algeria", "ko": "2026-07-03T03:00:00Z" },
+    { "id": "m86", "phase": "ko", "round": "R32", "mNum": 86, "home": "Argentina", "away": "Capul Verde", "ko": "2026-07-03T22:00:00Z" },
+    { "id": "m87", "phase": "ko", "round": "R32", "mNum": 87, "home": "Columbia", "away": "Ghana", "ko": "2026-07-04T01:30:00Z" },
+    { "id": "m88", "phase": "ko", "round": "R32", "mNum": 88, "home": "Australia", "away": "Egipt", "ko": "2026-07-03T18:00:00Z" },
+
+    { "id": "m89", "phase": "ko", "round": "R16", "mNum": 89, "homeRef": { "w": "m74" }, "awayRef": { "w": "m77" }, "ko": "2026-07-04T21:00:00Z" },
+    { "id": "m90", "phase": "ko", "round": "R16", "mNum": 90, "homeRef": { "w": "m73" }, "awayRef": { "w": "m75" }, "ko": "2026-07-04T17:00:00Z" },
+    { "id": "m91", "phase": "ko", "round": "R16", "mNum": 91, "homeRef": { "w": "m76" }, "awayRef": { "w": "m78" }, "ko": "2026-07-05T20:00:00Z" },
+    { "id": "m92", "phase": "ko", "round": "R16", "mNum": 92, "homeRef": { "w": "m79" }, "awayRef": { "w": "m80" }, "ko": "2026-07-06T00:00:00Z" },
+    { "id": "m93", "phase": "ko", "round": "R16", "mNum": 93, "homeRef": { "w": "m83" }, "awayRef": { "w": "m84" }, "ko": "2026-07-06T19:00:00Z" },
+    { "id": "m94", "phase": "ko", "round": "R16", "mNum": 94, "homeRef": { "w": "m81" }, "awayRef": { "w": "m82" }, "ko": "2026-07-07T00:00:00Z" },
+    { "id": "m95", "phase": "ko", "round": "R16", "mNum": 95, "homeRef": { "w": "m86" }, "awayRef": { "w": "m88" }, "ko": "2026-07-07T16:00:00Z" },
+    { "id": "m96", "phase": "ko", "round": "R16", "mNum": 96, "homeRef": { "w": "m85" }, "awayRef": { "w": "m87" }, "ko": "2026-07-07T20:00:00Z" },
+
+    { "id": "m97",  "phase": "ko", "round": "QF", "mNum": 97,  "homeRef": { "w": "m89" }, "awayRef": { "w": "m90" }, "ko": "2026-07-09T20:00:00Z" },
+    { "id": "m98",  "phase": "ko", "round": "QF", "mNum": 98,  "homeRef": { "w": "m93" }, "awayRef": { "w": "m94" }, "ko": "2026-07-10T19:00:00Z" },
+    { "id": "m99",  "phase": "ko", "round": "QF", "mNum": 99,  "homeRef": { "w": "m91" }, "awayRef": { "w": "m92" }, "ko": "2026-07-11T21:00:00Z" },
+    { "id": "m100", "phase": "ko", "round": "QF", "mNum": 100, "homeRef": { "w": "m95" }, "awayRef": { "w": "m96" }, "ko": "2026-07-12T01:00:00Z" },
+
+    { "id": "m101", "phase": "ko", "round": "SF", "mNum": 101, "homeRef": { "w": "m97" }, "awayRef": { "w": "m98" },  "ko": "2026-07-14T19:00:00Z" },
+    { "id": "m102", "phase": "ko", "round": "SF", "mNum": 102, "homeRef": { "w": "m99" }, "awayRef": { "w": "m100" }, "ko": "2026-07-15T19:00:00Z" },
+
+    { "id": "m103", "phase": "ko", "round": "3P", "mNum": 103, "homeRef": { "l": "m101" }, "awayRef": { "l": "m102" }, "ko": "2026-07-18T21:00:00Z" },
+
+    { "id": "m104", "phase": "ko", "round": "F", "mNum": 104, "homeRef": { "w": "m101" }, "awayRef": { "w": "m102" }, "ko": "2026-07-19T19:00:00Z" }
   ]
 }

@@ -36,6 +36,7 @@ const pairKey = (a, b) => [a, b].sort().join("-");
 const data = JSON.parse(readFileSync("./data.json", "utf8"));
 const lookup = new Map();
 for (const m of data.matches) {
+  if (m.phase === "ko") continue;            // play-off → introdus manual de admin
   const h = TLA[m.home], a = TLA[m.away];
   if (!h || !a) { console.warn("⚠️  Fără cod TLA pentru:", m.home, "/", m.away); continue; }
   lookup.set(pairKey(h, a), { id: m.id, homeTla: h });
